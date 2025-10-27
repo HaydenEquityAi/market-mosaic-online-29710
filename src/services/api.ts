@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Use VITE_API_URL environment variable in production, fallback to VPS backend
+// Use VITE_API_URL environment variable in production, fallback to HTTPS backend
 // For local development: VITE_API_URL=http://localhost:3010/api
-// For production (Vercel): Set VITE_API_URL environment variable to http://168.231.69.150:3010/api
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://168.231.69.150:3010/api';
+// For production (Vercel): Set VITE_API_URL environment variable to https://api.brokerai.ai/api
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.brokerai.ai/api';
 
 console.log('API Base URL:', API_BASE_URL);
 
