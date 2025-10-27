@@ -124,10 +124,10 @@ const Analysis = () => {
   
   return (
     <PageLayout title="Market Analysis">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Sector Performance (YTD)</h2>
-          <div className="h-80">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-card rounded-lg p-4 sm:p-6 shadow">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Sector Performance (YTD)</h2>
+          <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={sectorPerformance}
@@ -152,9 +152,9 @@ const Analysis = () => {
           </div>
         </div>
         
-        <div className="lg:col-span-2 bg-card rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Stock Performance Heatmap</h2>
-          <div className="h-80">
+        <div className="lg:col-span-2 bg-card rounded-lg p-4 sm:p-6 shadow">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Stock Performance Heatmap</h2>
+          <div className="h-64 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <Treemap
                 data={stockGrowthData}
@@ -166,22 +166,22 @@ const Analysis = () => {
               />
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 text-sm text-muted-foreground">
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
             <p>Showing performance by percentage change. Green indicates positive growth, red indicates decline.</p>
           </div>
         </div>
         
         {/* Cryptocurrency Analysis Section */}
-        <div className="lg:col-span-2 mt-4">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <div className="lg:col-span-2 mt-4 sm:mt-6">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
             <Bitcoin className="text-orange-500" />
             Cryptocurrency Analysis
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             {cryptoData.slice(0, 4).map((crypto) => (
               <Card key={crypto.symbol} className="bg-card">
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
                   <CardTitle className="text-base flex justify-between">
                     <span className="flex items-center gap-1">
                       <span className="font-bold">{crypto.symbol}</span>
@@ -194,8 +194,8 @@ const Analysis = () => {
                     )}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">${crypto.price < 1 ? crypto.price.toFixed(4) : crypto.price.toFixed(2)}</div>
+                <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                  <div className="text-xl sm:text-2xl font-bold">${crypto.price < 1 ? crypto.price.toFixed(4) : crypto.price.toFixed(2)}</div>
                   <div className={`text-sm ${crypto.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                     {crypto.change >= 0 ? '+' : ''}{crypto.change.toFixed(2)}%
                   </div>
@@ -214,9 +214,9 @@ const Analysis = () => {
             ))}
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card className="bg-card shadow">
-              <CardHeader>
+              <CardHeader className="px-3 sm:px-6 pt-3 sm:pt-6 pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Bitcoin className="h-5 w-5 text-orange-500" />
                   Bitcoin Price History (30 Days)
