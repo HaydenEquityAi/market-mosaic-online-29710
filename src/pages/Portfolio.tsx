@@ -263,28 +263,29 @@ const Portfolio = () => {
 
   return (
     <PageLayout title="Portfolio">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header with Add Button */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div>
-            <h1 className="text-3xl font-bold">My Portfolio</h1>
-            <p className="text-muted-foreground">Track your investments in real-time</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">My Portfolio</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Track your investments in real-time</p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="lg">
+              <Button size="lg" className="w-full sm:w-auto min-h-[44px]">
                 <Plus className="h-5 w-5 mr-2" />
-                Add Stock
+                <span className="hidden sm:inline">Add Stock</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Add Stock to Portfolio</DialogTitle>
+                <DialogTitle className="text-lg sm:text-xl">Add Stock to Portfolio</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Stock Search */}
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search Stock</Label>
+                  <Label htmlFor="search" className="text-sm sm:text-base">Search Stock</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -295,7 +296,7 @@ const Portfolio = () => {
                         setSearchQuery(e.target.value);
                         setSelectedStock(null);
                       }}
-                      className="pl-9"
+                      className="pl-9 h-11 sm:h-10"
                     />
                   </div>
                   {searchResults.length > 0 && !selectedStock && (
@@ -304,9 +305,9 @@ const Portfolio = () => {
                         <div
                           key={idx}
                           onClick={() => setSelectedStock(result)}
-                          className="p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                          className="p-3 hover:bg-accent cursor-pointer border-b last:border-b-0 min-h-[44px]"
                         >
-                          <div className="font-semibold">{result.symbol}</div>
+                          <div className="font-semibold text-sm">{result.symbol}</div>
                           <div className="text-sm text-muted-foreground">{result.name}</div>
                           {result.type && (
                             <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
@@ -318,10 +319,10 @@ const Portfolio = () => {
                     </div>
                   )}
                   {selectedStock && (
-                    <div className="flex items-center justify-between p-3 bg-accent rounded-md">
+                    <div className="flex items-center justify-between p-3 bg-accent rounded-md min-h-[44px]">
                       <div>
-                        <div className="font-semibold">{selectedStock.symbol}</div>
-                        <div className="text-sm text-muted-foreground">{selectedStock.name}</div>
+                        <div className="font-semibold text-sm">{selectedStock.symbol}</div>
+                        <div className="text-sm text-muted-foreground truncate">{selectedStock.name}</div>
                       </div>
                       <Button
                         type="button"
@@ -331,8 +332,9 @@ const Portfolio = () => {
                           setSelectedStock(null);
                           setSearchQuery('');
                         }}
+                        className="h-11 w-11"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-5 w-5" />
                       </Button>
                     </div>
                   )}
@@ -340,7 +342,7 @@ const Portfolio = () => {
 
                 {/* Quantity */}
                 <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity</Label>
+                  <Label htmlFor="quantity" className="text-sm sm:text-base">Quantity</Label>
                   <Input
                     id="quantity"
                     type="number"
@@ -349,12 +351,13 @@ const Portfolio = () => {
                     onChange={(e) => setQuantity(e.target.value)}
                     min="1"
                     step="1"
+                    className="h-11 sm:h-10"
                   />
                 </div>
 
                 {/* Average Cost */}
                 <div className="space-y-2">
-                  <Label htmlFor="averageCost">Average Purchase Price ($)</Label>
+                  <Label htmlFor="averageCost" className="text-sm sm:text-base">Average Purchase Price ($)</Label>
                   <Input
                     id="averageCost"
                     type="number"
@@ -363,18 +366,20 @@ const Portfolio = () => {
                     onChange={(e) => setAverageCost(e.target.value)}
                     min="0"
                     step="0.01"
+                    className="h-11 sm:h-10"
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
+                    className="w-full sm:w-auto min-h-[44px]"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={addHoldingMutation.isPending}>
+                  <Button type="submit" disabled={addHoldingMutation.isPending} className="w-full sm:w-auto min-h-[44px]">
                     {addHoldingMutation.isPending ? 'Adding...' : 'Add to Portfolio'}
                   </Button>
                 </div>
@@ -487,63 +492,65 @@ const Portfolio = () => {
             {/* Holdings Table */}
             <Card>
               <CardHeader>
-                <CardTitle>Holdings</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Holdings</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-3 px-4 font-medium">Symbol</th>
-                        <th className="text-left py-3 px-4 font-medium">Name</th>
-                        <th className="text-right py-3 px-4 font-medium">Shares</th>
-                        <th className="text-right py-3 px-4 font-medium">Avg Cost</th>
-                        <th className="text-right py-3 px-4 font-medium">Current Price</th>
-                        <th className="text-right py-3 px-4 font-medium">Market Value</th>
-                        <th className="text-right py-3 px-4 font-medium">Gain/Loss</th>
-                        <th className="text-right py-3 px-4 font-medium">% Change</th>
-                        <th className="text-right py-3 px-4 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {portfolioMetrics.items.map((item) => (
-                        <tr
-                          key={item.id}
-                          onClick={() => handleRowClick(item.symbol)}
-                          className="border-b hover:bg-accent cursor-pointer transition-colors"
-                        >
-                          <td className="py-3 px-4 font-semibold">{item.symbol}</td>
-                          <td className="py-3 px-4">{item.name}</td>
-                          <td className="py-3 px-4 text-right">{item.quantity || 0}</td>
-                          <td className="py-3 px-4 text-right">${(item.price || 0).toFixed(2)}</td>
-                          <td className="py-3 px-4 text-right">${(item.currentPrice || 0).toFixed(2)}</td>
-                          <td className="py-3 px-4 text-right">${(item.marketValue || 0).toFixed(2)}</td>
-                          <td className={cn(
-                            "py-3 px-4 text-right font-medium",
-                            (item.gainLoss || 0) >= 0 ? 'text-green-500' : 'text-red-500'
-                          )}>
-                            {(item.gainLoss || 0) >= 0 ? '+' : ''}${(item.gainLoss || 0).toFixed(2)}
-                          </td>
-                          <td className={cn(
-                            "py-3 px-4 text-right font-medium",
-                            (item.gainPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'
-                          )}>
-                            {(item.gainPercent || 0) >= 0 ? '+' : ''}{(item.gainPercent || 0).toFixed(2)}%
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => handleDelete(item.id, e)}
-                              className="hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </td>
+              <CardContent className="p-0 sm:p-6">
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Symbol</th>
+                          <th className="hidden md:table-cell text-left py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Name</th>
+                          <th className="text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Shares</th>
+                          <th className="text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Price</th>
+                          <th className="hidden lg:table-cell text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Current</th>
+                          <th className="hidden lg:table-cell text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Value</th>
+                          <th className="text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">G/L</th>
+                          <th className="text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">%</th>
+                          <th className="text-right py-3 px-3 sm:px-4 font-medium text-xs sm:text-sm">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {portfolioMetrics.items.map((item) => (
+                          <tr
+                            key={item.id}
+                            onClick={() => handleRowClick(item.symbol)}
+                            className="border-b hover:bg-accent cursor-pointer transition-colors"
+                          >
+                            <td className="py-3 px-3 sm:px-4 font-semibold text-xs sm:text-sm">{item.symbol}</td>
+                            <td className="hidden md:table-cell py-3 px-3 sm:px-4 text-xs sm:text-sm truncate max-w-[120px]">{item.name}</td>
+                            <td className="py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">{item.quantity || 0}</td>
+                            <td className="py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.price || 0).toFixed(2)}</td>
+                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.currentPrice || 0).toFixed(2)}</td>
+                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.marketValue || 0).toFixed(2)}</td>
+                            <td className={cn(
+                              "py-3 px-3 sm:px-4 text-right font-medium text-xs sm:text-sm",
+                              (item.gainLoss || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                            )}>
+                              {(item.gainLoss || 0) >= 0 ? '+' : ''}${(item.gainLoss || 0).toFixed(2)}
+                            </td>
+                            <td className={cn(
+                              "py-3 px-3 sm:px-4 text-right font-medium text-xs sm:text-sm",
+                              (item.gainPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                            )}>
+                              {(item.gainPercent || 0) >= 0 ? '+' : ''}{(item.gainPercent || 0).toFixed(1)}%
+                            </td>
+                            <td className="py-3 px-3 sm:px-4 text-right">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => handleDelete(item.id, e)}
+                                className="hover:text-destructive h-10 w-10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -551,16 +558,16 @@ const Portfolio = () => {
             {/* Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Portfolio Allocation</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Portfolio Allocation</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
                     <Pie
                       data={pieData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={100}
+                      outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${(percent ? (percent * 100).toFixed(0) : '0')}%`}
@@ -570,7 +577,7 @@ const Portfolio = () => {
                       ))}
                     </Pie>
                     <Tooltip formatter={(value: any) => `$${Number(value || 0).toFixed(2)}`} />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>

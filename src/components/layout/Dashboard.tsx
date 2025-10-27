@@ -11,7 +11,10 @@ import { MarketOverview } from '@/components/markets/MarketOverview';
 import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { NewsCard } from '@/components/news/NewsCard';
 import { StatsCard } from '@/components/ui/StatsCard';
-import { BarChart3, TrendingDown, TrendingUp, Wallet2 } from 'lucide-react';
+import { BarChart3, TrendingDown, TrendingUp, Wallet2, Menu, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -137,14 +140,32 @@ export function Dashboard() {
       <Navbar />
       
       <div className="flex-1 flex">
-        <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
+        {/* Desktop Sidebar */}
+        <aside className={cn(
+          "hidden lg:block transition-all duration-300",
+          isSidebarCollapsed ? "w-16" : "w-64"
+        )}>
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
+        </aside>
         
-        <main className="flex-1 transition-all duration-300">
-          <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-2xl font-bold mb-6">Market Dashboard</h1>
+        {/* Mobile Sidebar */}
+        <Sheet>
+          <SheetTrigger asChild className="lg:hidden fixed top-16 left-4 z-40">
+            <Button variant="outline" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <Sidebar isCollapsed={false} onToggle={toggleSidebar} />
+          </SheetContent>
+        </Sheet>
+        
+        <main className="flex-1 transition-all duration-300 lg:ml-0">
+          <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
+            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Market Dashboard</h1>
             
             {/* Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
               <StatsCard 
                 title="Market Cap" 
                 value="$13.42T"
@@ -178,11 +199,11 @@ export function Dashboard() {
             </div>
             
             {/* Main Content Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Left column - Stock list */}
-              <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
-                <h2 className="text-xl font-semibold">Watchlist</h2>
-                <div className="space-y-4">
+              <div className="lg:col-span-1 space-y-3 sm:space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
+                <h2 className="text-lg sm:text-xl font-semibold">Watchlist</h2>
+                <div className="space-y-3 sm:space-y-4">
                   {stocksWithHistory.slice(0, 5).map((stock) => (
                     <StockCard 
                       key={stock?.symbol || 'unknown'} 
@@ -205,7 +226,7 @@ export function Dashboard() {
                     volatility={2.5}
                   />
                 )}
-                <NewsCard news={mockNews} className="mt-6" />
+                <NewsCard news={mockNews} className="mt-4 sm:mt-6" />
               </div>
               
               {/* Right column - Markets and currencies */}

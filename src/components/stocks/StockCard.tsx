@@ -25,17 +25,17 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
       )}
       onClick={onClick}
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className="space-y-1">
-          <CardTitle className="text-base font-semibold leading-none">{stock.symbol || 'N/A'}</CardTitle>
-          <p className="text-xs text-muted-foreground truncate max-w-[180px]">{stock.name || 'Unknown'}</p>
+      <CardHeader className="flex flex-row items-center justify-between pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+        <div className="space-y-1 min-w-0 flex-1">
+          <CardTitle className="text-sm sm:text-base font-semibold leading-none truncate">{stock.symbol || 'N/A'}</CardTitle>
+          <p className="text-xs text-muted-foreground truncate">{stock.name || 'Unknown'}</p>
         </div>
-        <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+        <BarChart3Icon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0 ml-2" />
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="text-2xl font-bold">{formatCurrency(stock.price || 0)}</div>
+      <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1 sm:space-y-2 min-w-0">
+            <div className="text-lg sm:text-2xl font-bold truncate">{formatCurrency(stock.price || 0)}</div>
             <div className="flex items-center text-xs">
               <span className={cn(
                 "inline-flex items-center",
@@ -48,20 +48,22 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
                 {formatCurrency(Math.abs(stock.change || 0))} ({formatPercentage(stock.changePercent || 0)})
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-1 text-xs">
-              <div className="text-muted-foreground">Volume:</div>
-              <div className="text-right">{formatNumber(stock.volume || 0)}</div>
-              <div className="text-muted-foreground">Mkt Cap:</div>
-              <div className="text-right">{formatNumber(stock.marketCap || 0)}</div>
-              <div className="text-muted-foreground">Updated:</div>
-              <div className="text-right">{formatDate(stock.lastUpdated)}</div>
+            <div className="grid grid-cols-2 gap-1 text-[10px] sm:text-xs">
+              <div className="text-muted-foreground">Vol:</div>
+              <div className="text-right truncate">{formatNumber(stock.volume || 0)}</div>
+              <div className="text-muted-foreground hidden sm:block">Cap:</div>
+              <div className="text-right truncate hidden sm:block">{formatNumber(stock.marketCap || 0)}</div>
+              <div className="text-muted-foreground sm:hidden">Mkt:</div>
+              <div className="text-right truncate sm:hidden">{formatNumber(stock.marketCap || 0)}</div>
+              <div className="text-muted-foreground">Upd:</div>
+              <div className="text-right truncate">{formatDate(stock.lastUpdated)}</div>
             </div>
           </div>
-          <div className="h-24">
+          <div className="h-20 sm:h-24 flex items-center justify-center">
             {priceHistory && priceHistory.length > 0 && (
               <Sparkline 
                 data={priceHistory} 
-                color={isPositive ? 'rgb(var(--success))' : 'rgb(var(--danger))'}
+                color={isPositive ? 'rgb(var(--success))' : 'rgb(var(--danger))'} 
               />
             )}
           </div>
