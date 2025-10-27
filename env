@@ -9,6 +9,9 @@ NODE_ENV=development
 # Alpha Vantage - Get free key at: https://www.alphavantage.co/support/#api-key
 ALPHA_VANTAGE_API_KEY=17EEI41BQ1CEWK61
 
+# Polygon.io - Get free key at: https://polygon.io/
+POLYGON_API_KEY=0lY80I7WUvI4xFjJ3YwOvzD31lqnEAHv
+
 # Finnhub - Get free key at: https://finnhub.io/register
 FINNHUB_API_KEY=d3vemf9r01qt2ctpeh90d3vemf9r01qt2ctpeh9g
 
@@ -40,11 +43,10 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 
 # ============================================
-# Database Configuration (OPTIONAL)
-# Comment out these lines if you don't want to use PostgreSQL
+# Database Configuration
 # ============================================
-# DB_HOST=localhost
-# DB_PORT=5432
-# DB_NAME=financial_market_db
-# DB_USER=postgres
-# DB_PASSWORD=your_password_here
+DB_HOST=168.231.69.150
+DB_PORT=5432
+DB_NAME=financial_market_db
+DB_USER=financeapp
+DB_PASSWORD=CPAhay2020.

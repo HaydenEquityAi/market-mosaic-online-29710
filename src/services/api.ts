@@ -93,9 +93,20 @@ export const portfolioApi = {
   addHolding: async (portfolioId: string, symbol: string, quantity: number, averageCost: number) => {
     const response = await api.post(`/portfolios/${portfolioId}/holdings`, {
       symbol,
+      assetType: 'stock',
       quantity,
-      averageCost,
+      price: averageCost,
     });
+    return response.data.data;
+  },
+  
+  removeHolding: async (portfolioId: string, holdingId: string) => {
+    const response = await api.delete(`/portfolios/${portfolioId}/holdings/${holdingId}`);
+    return response.data.data;
+  },
+  
+  getHoldings: async (portfolioId: string) => {
+    const response = await api.get(`/portfolios/${portfolioId}/holdings`);
     return response.data.data;
   },
   

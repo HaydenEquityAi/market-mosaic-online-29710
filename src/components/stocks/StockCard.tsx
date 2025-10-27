@@ -7,14 +7,14 @@ import { Sparkline } from '@/components/stocks/Sparkline';
 import { cn } from '@/lib/utils';
 
 interface StockCardProps {
-  stock: Stock;
+  stock: Partial<Stock>; // Use Partial to allow undefined properties
   priceHistory?: number[];
   className?: string;
   onClick?: () => void;
 }
 
 export function StockCard({ stock, priceHistory, className, onClick }: StockCardProps) {
-  const isPositive = stock.change >= 0;
+  const isPositive = (stock.change || 0) >= 0;
   
   return (
     <Card 
@@ -27,15 +27,15 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="space-y-1">
-          <CardTitle className="text-base font-semibold leading-none">{stock.symbol}</CardTitle>
-          <p className="text-xs text-muted-foreground truncate max-w-[180px]">{stock.name}</p>
+          <CardTitle className="text-base font-semibold leading-none">{stock.symbol || 'N/A'}</CardTitle>
+          <p className="text-xs text-muted-foreground truncate max-w-[180px]">{stock.name || 'Unknown'}</p>
         </div>
         <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="text-2xl font-bold">{formatCurrency(stock.price)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(stock.price || 0)}</div>
             <div className="flex items-center text-xs">
               <span className={cn(
                 "inline-flex items-center",
@@ -45,14 +45,14 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
                   <ArrowUpIcon className="h-3 w-3 mr-1" /> : 
                   <ArrowDownIcon className="h-3 w-3 mr-1" />
                 }
-                {formatCurrency(Math.abs(stock.change))} ({formatPercentage(stock.changePercent)})
+                {formatCurrency(Math.abs(stock.change || 0))} ({formatPercentage(stock.changePercent || 0)})
               </span>
             </div>
             <div className="grid grid-cols-2 gap-1 text-xs">
               <div className="text-muted-foreground">Volume:</div>
-              <div className="text-right">{formatNumber(stock.volume)}</div>
+              <div className="text-right">{formatNumber(stock.volume || 0)}</div>
               <div className="text-muted-foreground">Mkt Cap:</div>
-              <div className="text-right">{formatNumber(stock.marketCap)}</div>
+              <div className="text-right">{formatNumber(stock.marketCap || 0)}</div>
               <div className="text-muted-foreground">Updated:</div>
               <div className="text-right">{formatDate(stock.lastUpdated)}</div>
             </div>

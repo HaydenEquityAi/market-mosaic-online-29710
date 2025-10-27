@@ -7,7 +7,7 @@ import cryptoService from '../services/crypto.service';
 import currencyService from '../services/currency.service';
 
 export const getPortfolios = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
 
   const result = await query(
     'SELECT id, name, description, created_at, updated_at FROM portfolios WHERE user_id = $1 ORDER BY created_at DESC',
@@ -18,7 +18,7 @@ export const getPortfolios = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPortfolio = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
 
   const result = await query(
@@ -34,7 +34,7 @@ export const getPortfolio = async (req: AuthRequest, res: Response) => {
 };
 
 export const createPortfolio = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { name, description } = req.body;
 
   if (!name) {
@@ -53,7 +53,7 @@ export const createPortfolio = async (req: AuthRequest, res: Response) => {
 };
 
 export const updatePortfolio = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
   const { name, description } = req.body;
 
@@ -73,7 +73,7 @@ export const updatePortfolio = async (req: AuthRequest, res: Response) => {
 };
 
 export const deletePortfolio = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
 
   const result = await query(
@@ -89,7 +89,7 @@ export const deletePortfolio = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPortfolioHoldings = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
 
   // Verify portfolio belongs to user
@@ -150,7 +150,7 @@ export const getPortfolioHoldings = async (req: AuthRequest, res: Response) => {
 };
 
 export const addHolding = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
   const { symbol, assetType, quantity, price } = req.body;
 
@@ -212,7 +212,7 @@ export const addHolding = async (req: AuthRequest, res: Response) => {
 };
 
 export const removeHolding = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id, holdingId } = req.params;
 
   // Verify portfolio belongs to user
@@ -238,7 +238,7 @@ export const removeHolding = async (req: AuthRequest, res: Response) => {
 };
 
 export const getPortfolioTransactions = async (req: AuthRequest, res: Response) => {
-  const userId = req.userId;
+  const userId = req.userId || 'test-user';
   const { id } = req.params;
   const { limit = 50, offset = 0 } = req.query;
 

@@ -403,7 +403,12 @@ export function generatePriceHistory(days: number = 30, startPrice: number = 100
   return prices;
 }
 
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | undefined | null): string {
+  // Handle null/undefined/NaN
+  if (num === null || num === undefined || isNaN(num)) {
+    return '$0.00';
+  }
+  
   if (num >= 1000000000000) {
     return `$${(num / 1000000000000).toFixed(2)}T`;
   }
@@ -419,11 +424,20 @@ export function formatNumber(num: number): string {
   return `$${num.toFixed(2)}`;
 }
 
-export function formatPercentage(num: number): string {
+export function formatPercentage(num: number | undefined | null): string {
+  // Handle null/undefined/NaN
+  if (num === null || num === undefined || isNaN(num)) {
+    return '0.00%';
+  }
   return `${num > 0 ? '+' : ''}${num.toFixed(2)}%`;
 }
 
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number | undefined | null): string {
+  // Handle null/undefined/NaN
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '$0.00';
+  }
+  
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',

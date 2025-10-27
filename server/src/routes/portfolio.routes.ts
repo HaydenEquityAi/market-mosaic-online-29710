@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import * as portfolioController from '../controllers/portfolio.controller';
-import { authMiddleware } from '../middleware/auth';
+import { optionalAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 
 const router = Router();
 
-// All portfolio routes require authentication
-router.use(authMiddleware);
+// All portfolio routes use optional auth (works without login for testing)
+router.use(optionalAuth);
 
 router.get('/', asyncHandler(portfolioController.getPortfolios));
 router.post('/', asyncHandler(portfolioController.createPortfolio));
