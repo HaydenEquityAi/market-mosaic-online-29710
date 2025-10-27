@@ -1,10 +1,8 @@
 
 import React, { useState } from 'react';
-import { 
-  useStockData, useMarketIndices, useCurrencyPairs, 
-  mockStocks, mockIndices, mockCurrencies, mockNews,
-  generatePriceHistory 
-} from '@/utils/stocksApi';
+import { useQuery } from '@tanstack/react-query';
+import { stocksApi, marketsApi, currenciesApi } from '@/services/api';
+import { mockNews, generatePriceHistory } from '@/utils/stocksApi';
 import { Navbar } from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { StockCard } from '@/components/stocks/StockCard';
@@ -17,33 +15,118 @@ import { BarChart3, TrendingDown, TrendingUp, Wallet2 } from 'lucide-react';
 
 export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [selectedStock, setSelectedStock] = useState(mockStocks[0]);
   
-  // Use our hooks to get real-time mock data
-  const stocks = useStockData(mockStocks);
-  const indices = useMarketIndices(mockIndices);
-  const currencies = useCurrencyPairs(mockCurrencies);
+  // Fetch real data from API
+  const { data: stocks, isLoading: stocksLoading, error: stocksError } = useQuery({
+    queryKey: ['stocks', ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']],
+    queryFn: () => stocksApi.getMultipleQuotes(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']),
+    refetchInterval: 60000, // Refresh every 60 seconds
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 3,
+  });
+
+  const { data: indices, isLoading: indicesLoading, error: indicesError } = useQuery({
+    queryKey: ['market-indices'],
+    queryFn: marketsApi.getIndices,
+    refetchInterval: 60000,
+    staleTime: 30000,
+    retry: 3,
+  });
+
+  const { data: cryptos, isLoading: cryptosLoading } = useQuery({
+    queryKey: ['top-cryptos'],
+    queryFn: () => currenciesApi.getTopCryptos(10),
+    refetchInterval: 60000,
+    staleTime: 30000,
+    retry: 3,
+  });
+
+  // Set default selected stock
+  const [selectedStock, setSelectedStock] = useState<any>(null);
+  
+  React.useEffect(() => {
+    if (stocks && stocks.length > 0) {
+      setSelectedStock(stocks[0]);
+    }
+  }, [stocks]);
+  
+  // Debug logging
+  console.log('Dashboard Data:', { stocks, indices, cryptos, stocksLoading, indicesLoading, stocksError, indicesError });
+  
+  // Show loading state
+  if (stocksLoading || indicesLoading || cryptosLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading market data...</div>
+      </div>
+    );
+  }
+  
+  // Show error state only if there's actually an error
+  if (stocksError || indicesError) {
+    console.error('API Errors:', { stocksError, indicesError });
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg text-red-500">
+          Error loading market data. Please check if the backend server is running.
+          <br />
+          <small className="text-sm text-gray-500">{stocksError?.message || indicesError?.message}</small>
+        </div>
+      </div>
+    );
+  }
+  
+  // Check if we have data (even if empty array is fine)
+  if (!stocks || stocks.length === 0) {
+    console.warn('No stocks data available');
+  }
+  
+  if (!indices || indices.length === 0) {
+    console.warn('No indices data available');
+  }
+  
+  // Use safe defaults for stocks array
+  const stocksArray: any[] = Array.isArray(stocks) ? stocks : [];
+  const indicesArray: any[] = Array.isArray(indices) ? indices : [];
+  const cryptosArray: any[] = Array.isArray(cryptos) ? cryptos : [];
   
   // Generate chart data for the selected stock
-  const selectedStockHistory = generatePriceHistory(30, selectedStock.price, 2);
+  const selectedStockHistory = selectedStock ? generatePriceHistory(30, selectedStock.price, 2) : [];
   
   // Generate chart data for stock cards
-  const stocksWithHistory = stocks.map(stock => {
+  const stocksWithHistory = stocksArray.map((stock: any) => {
     return {
       ...stock,
-      priceHistory: generatePriceHistory(30, stock.price, 2)
+      priceHistory: generatePriceHistory(30, stock.price || 100, 2)
     };
   });
   
-  // Calculate market statistics
-  const gainers = stocks.filter(stock => stock.changePercent > 0);
-  const losers = stocks.filter(stock => stock.changePercent < 0);
+  // Convert crypto data to currency format (handle both cases)
+  const currencies = cryptosArray.map((crypto: any) => ({
+    symbol: crypto?.symbol || 'UNKNOWN',
+    fromCurrency: 'USD',
+    toCurrency: crypto?.symbol || 'UNKNOWN',
+    rate: crypto?.price || 0,
+    change: crypto?.changePercent24h || crypto?.changePercent || 0,
+    changePercent: crypto?.changePercent24h || crypto?.changePercent || 0,
+    lastUpdated: new Date(),
+  }));
   
-  const topGainer = [...stocks].sort((a, b) => b.changePercent - a.changePercent)[0];
-  const topLoser = [...stocks].sort((a, b) => a.changePercent - b.changePercent)[0];
+  // Calculate market statistics with safe defaults
+  const gainers = stocksArray.filter((stock: any) => (stock?.changePercent || 0) > 0);
+  const losers = stocksArray.filter((stock: any) => (stock?.changePercent || 0) < 0);
   
-  const totalMarketCap = stocks.reduce((sum, stock) => sum + stock.marketCap, 0);
-  const totalVolume = stocks.reduce((sum, stock) => sum + stock.volume, 0);
+  // Get top gainer/loser with safety checks
+  const topGainer = stocksArray.length > 0 
+    ? [...stocksArray].sort((a: any, b: any) => (b?.changePercent || 0) - (a?.changePercent || 0))[0]
+    : { symbol: 'N/A', changePercent: 0, name: 'No data' };
+    
+  const topLoser = stocksArray.length > 0
+    ? [...stocksArray].sort((a: any, b: any) => (a?.changePercent || 0) - (b?.changePercent || 0))[0]
+    : { symbol: 'N/A', changePercent: 0, name: 'No data' };
+  
+  const totalMarketCap = stocksArray.reduce((sum: number, stock: any) => sum + (stock?.marketCap || 0), 0);
+  const totalVolume = stocksArray.reduce((sum: number, stock: any) => sum + (stock?.volume || 0), 0);
   
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => !prev);
@@ -78,17 +161,17 @@ export function Dashboard() {
               />
               <StatsCard 
                 title="Top Gainer" 
-                value={topGainer.symbol}
-                trend={topGainer.changePercent}
-                trendLabel={topGainer.name}
+                value={topGainer?.symbol || 'N/A'}
+                trend={topGainer?.changePercent || 0}
+                trendLabel={topGainer?.name || 'No data'}
                 icon={<TrendingUp />}
                 className="bg-success/5"
               />
               <StatsCard 
                 title="Top Loser" 
-                value={topLoser.symbol}
-                trend={topLoser.changePercent}
-                trendLabel={topLoser.name}
+                value={topLoser?.symbol || 'N/A'}
+                trend={topLoser?.changePercent || 0}
+                trendLabel={topLoser?.name || 'No data'}
                 icon={<TrendingDown />}
                 className="bg-danger/5"
               />
@@ -102,11 +185,11 @@ export function Dashboard() {
                 <div className="space-y-4">
                   {stocksWithHistory.slice(0, 5).map((stock) => (
                     <StockCard 
-                      key={stock.symbol} 
+                      key={stock?.symbol || 'unknown'} 
                       stock={stock} 
-                      priceHistory={stock.priceHistory}
+                      priceHistory={stock?.priceHistory || []}
                       onClick={() => setSelectedStock(stock)}
-                      className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
+                      className={selectedStock?.symbol === stock?.symbol ? "ring-2 ring-primary" : ""}
                     />
                   ))}
                 </div>
@@ -114,18 +197,20 @@ export function Dashboard() {
               
               {/* Middle column - Chart and news */}
               <div className="lg:col-span-2 space-y-4 animate-slide-up" style={{ '--delay': '300ms' } as React.CSSProperties}>
-                <StockChart 
-                  symbol={selectedStock.symbol} 
-                  name={selectedStock.name} 
-                  currentPrice={selectedStock.price}
-                  volatility={2.5}
-                />
+                {selectedStock && (
+                  <StockChart 
+                    symbol={selectedStock?.symbol || 'N/A'} 
+                    name={selectedStock?.name || 'Unknown'} 
+                    currentPrice={selectedStock?.price || 0}
+                    volatility={2.5}
+                  />
+                )}
                 <NewsCard news={mockNews} className="mt-6" />
               </div>
               
               {/* Right column - Markets and currencies */}
               <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '400ms' } as React.CSSProperties}>
-                <MarketOverview indices={indices} />
+                <MarketOverview indices={indicesArray} />
                 <CurrencyExchange currencies={currencies} />
               </div>
             </div>

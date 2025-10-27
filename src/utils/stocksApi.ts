@@ -432,9 +432,21 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | string | undefined): string {
+  // Handle null/undefined
+  if (!date) return 'N/A';
+  
+  // Convert string to Date if needed
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  // Check if date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date:', date);
+    return 'Invalid Date';
+  }
+  
   const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
+  const diffInMs = now.getTime() - dateObj.getTime();
   const diffInSec = Math.floor(diffInMs / 1000);
   const diffInMin = Math.floor(diffInSec / 60);
   const diffInHour = Math.floor(diffInMin / 60);
@@ -446,7 +458,7 @@ export function formatDate(date: Date): string {
   } else if (diffInHour < 24) {
     return `${diffInHour}h ago`;
   } else {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 }
 
