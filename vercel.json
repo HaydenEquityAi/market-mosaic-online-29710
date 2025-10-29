@@ -1,13 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "ignoreCommand": "if [ \"$VERCEL_ENV\" == \"production\" ]; then exit 0; else exit 1; fi"
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
 }
