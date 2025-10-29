@@ -69,11 +69,11 @@ const Portfolio = () => {
       console.error('Failed to create portfolio:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create portfolio. Using default ID.',
+        description: 'Using guest portfolio (no login required).',
         variant: 'destructive',
       });
-      // Fallback to default ID
-      setPortfolioId('1');
+      // Use guest portfolio (no ID)
+      setPortfolioId(null);
     },
   });
 
@@ -95,9 +95,9 @@ const Portfolio = () => {
 
   // Fetch holdings (only when we have a portfolio ID)
   const { data: holdings = [], isLoading: holdingsLoading, error } = useQuery({
-    queryKey: ['portfolio', portfolioId, 'holdings'],
-    queryFn: () => portfolioApi.getHoldings(portfolioId!),
-    enabled: !!portfolioId,
+    queryKey: ['portfolio', portfolioId ?? 'guest', 'holdings'],
+    queryFn: () => (portfolioId ? portfolioApi.getHoldings(portfolioId) : portfolioApi.getGuestHoldings()),
+    enabled: true,
     refetchInterval: 60000,
     retry: 3,
   });
@@ -182,8 +182,9 @@ const Portfolio = () => {
   // Add holding mutation
   const addHoldingMutation = useMutation({
     mutationFn: async (data: { symbol: string; quantity: number; averageCost: number }) => {
-      if (!portfolioId) throw new Error('No portfolio ID available');
-      return portfolioApi.addHolding(portfolioId, data.symbol, data.quantity, data.averageCost);
+      return portfolioId
+        ? portfolioApi.addHolding(portfolioId, data.symbol, data.quantity, data.averageCost)
+        : portfolioApi.addGuestHolding(data.symbol, data.quantity, data.averageCost);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId, 'holdings'] });
@@ -209,8 +210,9 @@ const Portfolio = () => {
   // Delete holding mutation
   const deleteHoldingMutation = useMutation({
     mutationFn: async (holdingId: string) => {
-      if (!portfolioId) throw new Error('No portfolio ID available');
-      return portfolioApi.removeHolding(portfolioId, holdingId);
+      return portfolioId
+        ? portfolioApi.removeHolding(portfolioId, holdingId)
+        : portfolioApi.removeGuestHolding(holdingId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId, 'holdings'] });

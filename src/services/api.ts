@@ -78,6 +78,25 @@ export const currenciesApi = {
 
 // Portfolio API (NOTE: Requires authentication and database)
 export const portfolioApi = {
+  // Guest
+  getGuestHoldings: async () => {
+    const response = await api.get('/portfolio/holdings');
+    return response.data.data;
+  },
+  addGuestHolding: async (symbol: string, quantity: number, averageCost: number) => {
+    const response = await api.post('/portfolio/holdings', {
+      symbol,
+      assetType: 'stock',
+      quantity,
+      price: averageCost,
+    });
+    return response.data.data;
+  },
+  removeGuestHolding: async (holdingId: string) => {
+    const response = await api.delete(`/portfolio/holdings/${holdingId}`);
+    return response.data;
+  },
+
   getAll: async () => {
     const response = await api.get('/portfolios');
     return response.data.data;
