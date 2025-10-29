@@ -36,7 +36,7 @@ const allowedOrigins = [
 
 // Add environment-specific origins if provided
 if (process.env.CORS_ORIGIN) {
-  const envOrigins = process.env.CORS_ORIGIN.split(',');
+  const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
   allowedOrigins.push(...envOrigins);
 }
 
@@ -50,7 +50,7 @@ app.use(cors({
 
     // Check if origin is in the allowed list
     if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      return callback(null, origin);
     }
 
     // Check if origin matches Vercel preview URL pattern
@@ -59,7 +59,7 @@ app.use(cors({
     const vercelPattern = /^https:\/\/market-mosaic-online-29710-[a-z0-9-]+\.vercel\.app$/;
     if (vercelPattern.test(origin)) {
       console.log(`✅ CORS allowed for Vercel preview: ${origin}`);
-      return callback(null, true);
+      return callback(null, origin);
     }
 
     console.log(`⚠️  Blocked CORS request from: ${origin}`);

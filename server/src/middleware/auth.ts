@@ -32,7 +32,7 @@ export const authMiddleware = async (
       email: decoded.email,
     };
 
-    next();
+    return next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
@@ -59,9 +59,9 @@ export const optionalAuth = async (
       };
     }
 
-    next();
+    return next();
   } catch (error) {
     // Continue without authentication
-    next();
+    return next();
   }
 };

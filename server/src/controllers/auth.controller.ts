@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions, Secret } from 'jsonwebtoken';
 import { query } from '../config/database';
 import { AppError } from '../middleware/errorHandler';
 
@@ -31,10 +31,12 @@ export const register = async (req: Request, res: Response) => {
   const user = result.rows[0];
 
   // Generate JWT token
+  const jwtSecret: Secret = process.env.JWT_SECRET as Secret;
+  const jwtExpiresIn: SignOptions['expiresIn'] = (process.env.JWT_EXPIRES_IN as any) || '7d';
   const token = jwt.sign(
     { userId: user.id, email: user.email },
-    process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    jwtSecret,
+    { expiresIn: jwtExpiresIn }
   );
 
   res.status(201).json({
@@ -78,10 +80,12 @@ export const login = async (req: Request, res: Response) => {
   }
 
   // Generate JWT token
+  const jwtSecret: Secret = process.env.JWT_SECRET as Secret;
+  const jwtExpiresIn: SignOptions['expiresIn'] = (process.env.JWT_EXPIRES_IN as any) || '7d';
   const token = jwt.sign(
     { userId: user.id, email: user.email },
-    process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    jwtSecret,
+    { expiresIn: jwtExpiresIn }
   );
 
   res.json({
