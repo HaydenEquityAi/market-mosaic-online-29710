@@ -71,6 +71,7 @@ export function PredictiveIntelligence() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="text-xs text-muted-foreground">Real-time predictions coming soon. Demo data shown below.</div>
         {mockPredictions.map((prediction, index) => (
           <div 
             key={prediction.symbol}

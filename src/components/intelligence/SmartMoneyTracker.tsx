@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import {
   Award, DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { smartMoneyApi, type CongressTrade as ApiCongressTrade, type HedgeFundActivity as ApiHedge, type InsiderTrade as ApiInsider } from '@/services/smartMoneyApi';
 
 interface CongressTrade {
   id: string;
@@ -40,106 +42,62 @@ interface InsiderTrade {
   date: string;
 }
 
-const mockCongressTrades: CongressTrade[] = [
-  {
-    id: '1',
-    name: 'Rep. Garcia',
-    title: 'Representative',
-    party: 'D',
-    action: 'bought',
-    ticker: 'NVDA',
-    amount: '$150K',
-    date: '3d ago'
-  },
-  {
-    id: '2',
-    name: 'Sen. Lee',
-    title: 'Senator',
-    party: 'R',
-    action: 'sold',
-    ticker: 'AAPL',
-    amount: '$40K',
-    date: '5d ago'
-  },
-  {
-    id: '3',
-    name: 'Rep. Johnson',
-    title: 'Representative',
-    party: 'R',
-    action: 'bought',
-    ticker: 'AMD',
-    amount: '$75K',
-    date: '1w ago'
-  }
-];
+// Map backend to UI models
+const mapCongress = (rows: ApiCongressTrade[] | undefined): CongressTrade[] =>
+  (rows || []).map((r) => ({
+    id: String(r.id),
+    name: r.politician,
+    title: r.office,
+    party: r.party,
+    action: r.action === 'buy' ? 'bought' : 'sold',
+    ticker: r.ticker,
+    amount: r.amount,
+    date: new Date(r.disclosureDate || r.transactionDate).toLocaleDateString(),
+  }));
 
-const mockHedgeFunds: HedgeFundActivity[] = [
-  {
-    id: '1',
-    fund: 'Bridgewater Associates',
-    action: 'increased',
-    ticker: 'ARLP',
-    changePercent: 23,
-    quarterlyReturn: 12.4
-  },
-  {
-    id: '2',
-    fund: 'Renaissance Technologies',
-    action: 'increased',
-    ticker: 'NVDA',
-    changePercent: 10,
-    quarterlyReturn: 18.7
-  },
-  {
-    id: '3',
-    fund: 'Citadel',
-    action: 'new',
-    ticker: 'PLTR',
-    changePercent: 100,
-    quarterlyReturn: 15.2
-  },
-  {
-    id: '4',
-    fund: 'Two Sigma',
-    action: 'decreased',
-    ticker: 'TSLA',
-    changePercent: -15,
-    quarterlyReturn: 9.8
-  }
-];
+const mapHedge = (rows: ApiHedge[] | undefined): HedgeFundActivity[] =>
+  (rows || []).map((r, idx) => ({
+    id: String(r.id ?? idx),
+    fund: r.fundName,
+    action: r.action as HedgeFundActivity['action'],
+    ticker: r.ticker,
+    changePercent: r.percentChange,
+    quarterlyReturn: r.currentValue,
+  }));
 
-const mockInsiders: InsiderTrade[] = [
-  {
-    id: '1',
-    company: 'Advanced Micro Devices',
-    ticker: 'AMD',
-    insiderType: 'CEO',
-    action: 'buy',
-    amount: '$1.2M',
-    date: '2d ago'
-  },
-  {
-    id: '2',
-    company: 'NVIDIA Corporation',
-    ticker: 'NVDA',
-    insiderType: 'CFO',
-    action: 'buy',
-    amount: '$850K',
-    date: '4d ago'
-  },
-  {
-    id: '3',
-    company: 'Alliance Resource Partners',
-    ticker: 'ARLP',
-    insiderType: 'Director',
-    action: 'buy',
-    amount: '$420K',
-    date: '1w ago'
-  }
-];
+const mapInsiders = (rows: ApiInsider[] | undefined): InsiderTrade[] =>
+  (rows || []).map((r) => ({
+    id: String(r.id),
+    company: r.company,
+    ticker: r.ticker,
+    insiderType: r.insiderTitle,
+    action: r.action,
+    amount: `$${(r.totalValue ?? 0).toLocaleString()}`,
+    date: new Date(r.filingDate || r.transactionDate).toLocaleDateString(),
+  }));
 
 export function SmartMoneyTracker() {
   const [activeTab, setActiveTab] = useState('congress');
+  
+  const { data: congressRaw, isLoading: congressLoading, isError: congressError } = useQuery({
+    queryKey: ['smartmoney', 'congress', { days: 7 }],
+    queryFn: () => smartMoneyApi.getCongressTrades(7),
+    refetchInterval: 120000,
+  });
+  const { data: hedgeRaw, isLoading: hedgeLoading, isError: hedgeError } = useQuery({
+    queryKey: ['smartmoney', 'hedge'],
+    queryFn: () => smartMoneyApi.getHedgeFundActivity(),
+    refetchInterval: 180000,
+  });
+  const { data: insidersRaw, isLoading: insidersLoading, isError: insidersError } = useQuery({
+    queryKey: ['smartmoney', 'insiders', { days: 30 }],
+    queryFn: () => smartMoneyApi.getInsiderTrades(undefined, 30),
+    refetchInterval: 180000,
+  });
+
+  const congress = useMemo(() => mapCongress(congressRaw), [congressRaw]);
+  const hedgeFunds = useMemo(() => mapHedge(hedgeRaw), [hedgeRaw]);
+  const insiders = useMemo(() => mapInsiders(insidersRaw), [insidersRaw]);
   
   return (
     <Card className="border-2 border-purple-500/20">
@@ -150,6 +108,12 @@ export function SmartMoneyTracker() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {(congressLoading || hedgeLoading || insidersLoading) && (
+          <div className="p-2 text-sm text-muted-foreground">Loading smart money data…</div>
+        )}
+        {(congressError || hedgeError || insidersError) && (
+          <div className="p-2 text-sm text-red-500">Failed to load some data.</div>
+        )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="congress">
@@ -171,11 +135,11 @@ export function SmartMoneyTracker() {
             <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/20 mb-4">
               <p className="text-sm font-semibold mb-1">📊 Past 7 Days Activity</p>
               <p className="text-xs text-muted-foreground">
-                {mockCongressTrades.length} trades detected • Track similar trades for alerts
+                {(congress || []).length} trades detected • Track similar trades for alerts
               </p>
             </div>
             
-            {mockCongressTrades.map((trade) => (
+            {(congress || []).map((trade) => (
               <div 
                 key={trade.id}
                 className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-all"
@@ -242,7 +206,7 @@ export function SmartMoneyTracker() {
               </p>
             </div>
             
-            {mockHedgeFunds.map((activity) => (
+            {(hedgeFunds || []).map((activity) => (
               <div 
                 key={activity.id}
                 className="p-4 rounded-lg border bg-card"
@@ -304,7 +268,7 @@ export function SmartMoneyTracker() {
               </p>
             </div>
             
-            {mockInsiders.map((insider) => (
+            {(insiders || []).map((insider) => (
               <div 
                 key={insider.id}
                 className="p-4 rounded-lg border bg-card"

@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import {
   Twitter, MessageSquare, Filter
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { newsApi, type NewsArticle, type SentimentData } from '@/services/newsApi';
 
 interface NewsItem {
   id: string;
@@ -28,58 +30,56 @@ interface SocialSentiment {
   trendingScore: number;
 }
 
-const mockNews: NewsItem[] = [
-  {
-    id: '1',
-    title: 'AMD partners with MSFT on AI chip development',
-    impact: 'high',
-    impactPercent: '+3-5%',
-    ticker: 'AMD',
-    source: 'Reuters',
-    time: '2h ago',
-    url: '#'
-  },
-  {
-    id: '2',
-    title: 'Energy bill passes Senate with bipartisan support',
-    impact: 'medium',
-    impactPercent: '+1-2%',
-    ticker: 'ARLP',
-    source: 'Bloomberg',
-    time: '4h ago',
-    url: '#'
-  },
-  {
-    id: '3',
-    title: 'S&P 500 reaches new all-time high',
-    impact: 'low',
-    impactPercent: '+0.3%',
-    ticker: 'SPY',
-    source: 'CNBC',
-    time: '6h ago',
-    url: '#'
-  },
-  {
-    id: '4',
-    title: 'Fed signals potential rate cuts in Q2 2025',
-    impact: 'high',
-    impactPercent: '+2-4%',
-    ticker: 'Market',
-    source: 'WSJ',
-    time: '1d ago',
-    url: '#'
-  }
-];
+// Mappers to convert backend responses to UI items
+const mapNewsToUi = (articles: NewsArticle[] | undefined): NewsItem[] => {
+  return (articles || []).map((a) => ({
+    id: String(a.id ?? `${a.ticker}-${a.publishedAt}`),
+    title: a.title,
+    impact: (a.sentimentScore ?? 0) > 0.5 ? 'high' : (a.sentimentScore ?? 0) < -0.2 ? 'low' : 'medium',
+    impactPercent: a.sentimentScore !== undefined ? `${(Math.abs(a.sentimentScore) * 100).toFixed(0)}%` : '+0%',
+    ticker: a.ticker || 'MARKET',
+    source: a.source || 'Unknown',
+    time: new Date(a.publishedAt).toLocaleString(),
+    url: a.url || '#',
+  }));
+};
 
-const mockSentiment: SocialSentiment[] = [
-  { ticker: 'AMD', positivePercent: 64, change: 12, trendingScore: 95 },
-  { ticker: 'NVDA', positivePercent: 72, change: 8, trendingScore: 88 },
-  { ticker: 'PLTR', positivePercent: 58, change: -5, trendingScore: 76 },
-  { ticker: 'ARLP', positivePercent: 51, change: 3, trendingScore: 42 }
-];
+const mapSentimentToUi = (rows: SentimentData[] | undefined): SocialSentiment[] => {
+  return (rows || []).map((s) => ({
+    ticker: s.ticker,
+    positivePercent: Math.round(s.positivePercent ?? 0),
+    change: Math.round(s.change24h ?? 0),
+    trendingScore: Math.round(s.trendingScore ?? 0),
+  }));
+};
 
 export function NewsSentimentAnalyzer() {
   const [filter, setFilter] = useState<'all' | 'holdings' | 'trending'>('all');
+  
+  // Fetch latest news
+  const {
+    data: latestNews,
+    isLoading: newsLoading,
+    isError: newsError,
+  } = useQuery({
+    queryKey: ['news', 'latest'],
+    queryFn: () => newsApi.getLatestNews(20),
+    refetchInterval: 60000,
+  });
+
+  // Fetch social sentiment
+  const {
+    data: socialSentiment,
+    isLoading: sentimentLoading,
+    isError: sentimentError,
+  } = useQuery({
+    queryKey: ['news', 'social-sentiment'],
+    queryFn: () => newsApi.getSocialSentiment(['AAPL', 'NVDA', 'TSLA', 'AMD', 'SPY']),
+    refetchInterval: 120000,
+  });
+
+  const uiNews = useMemo(() => mapNewsToUi(latestNews), [latestNews]);
+  const uiSentiment = useMemo(() => mapSentimentToUi(socialSentiment), [socialSentiment]);
   
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -130,6 +130,12 @@ export function NewsSentimentAnalyzer() {
         </div>
       </CardHeader>
       <CardContent>
+        {(newsLoading || sentimentLoading) && (
+          <div className="p-4 text-sm text-muted-foreground">Loading intelligence data…</div>
+        )}
+        {(newsError || sentimentError) && (
+          <div className="p-4 text-sm text-red-500">Failed to load intelligence data.</div>
+        )}
         <Tabs defaultValue="news" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="news">
@@ -144,7 +150,7 @@ export function NewsSentimentAnalyzer() {
           
           {/* News Tab */}
           <TabsContent value="news" className="space-y-3">
-            {mockNews.map((news) => (
+            {(uiNews || []).map((news) => (
               <div 
                 key={news.id}
                 className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-all cursor-pointer"
@@ -177,8 +183,10 @@ export function NewsSentimentAnalyzer() {
                       {news.impactPercent} est.
                     </span>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    <ExternalLink className="h-3 w-3" />
+                  <Button asChild variant="ghost" size="sm">
+                    <a href={news.url} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
                   </Button>
                 </div>
               </div>
@@ -193,15 +201,15 @@ export function NewsSentimentAnalyzer() {
                 <span className="text-sm font-semibold">Trending Tickers</span>
               </div>
               <div className="flex gap-2 flex-wrap">
-                {['NVDA', 'PLTR', 'ARLP', 'AMD', 'TSLA'].map((ticker) => (
-                  <Badge key={ticker} variant="secondary" className="font-mono">
-                    {ticker}
+                {(uiSentiment || []).slice(0, 8).map((s) => (
+                  <Badge key={s.ticker} variant="secondary" className="font-mono">
+                    {s.ticker}
                   </Badge>
                 ))}
               </div>
             </div>
             
-            {mockSentiment.map((sentiment) => (
+            {(uiSentiment || []).map((sentiment) => (
               <div 
                 key={sentiment.ticker}
                 className="p-4 rounded-lg border bg-card"
