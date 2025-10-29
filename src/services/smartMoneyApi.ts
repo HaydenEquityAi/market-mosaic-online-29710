@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use the same base URL configuration as api.ts
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.brokerai.ai/api';
+// Hardcoded production API base URL
+const API_BASE_URL = 'https://api.brokerai.ai/api';
 
 export interface CongressTrade {
   id: string;
