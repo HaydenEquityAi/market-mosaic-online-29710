@@ -25,10 +25,47 @@ const PORT = process.env.PORT || 3010;
 
 // Middleware
 app.use(helmet()); // Security headers
+
+// CORS configuration with pattern matching for Vercel preview deployments
+const allowedOrigins = [
+  'http://localhost:8080',
+  'http://localhost:8081',
+  'http://localhost:5173',
+  'https://market-mosaic-online-29710.vercel.app',
+];
+
+// Add environment-specific origins if provided
+if (process.env.CORS_ORIGIN) {
+  const envOrigins = process.env.CORS_ORIGIN.split(',');
+  allowedOrigins.push(...envOrigins);
+}
+
+// CORS with origin validation
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:8080', 'http://localhost:8081'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if origin is in the allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Check if origin matches Vercel preview URL pattern
+    // Pattern: https://market-mosaic-online-29710-*-*.vercel.app
+    const vercelPattern = /^https:\/\/market-mosaic-online-29710-[\w-]+-[\w]+\.vercel\.app$/;
+    if (vercelPattern.test(origin)) {
+      return callback(null, true);
+    }
+
+    console.log(`⚠️  Blocked CORS request from: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
+
 app.use(morgan('combined')); // Logging
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
