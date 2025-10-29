@@ -8,6 +8,11 @@ const router = Router();
 // All portfolio routes use optional auth (works without login for testing)
 router.use(optionalAuth);
 
+// Guest-friendly routes (no :id required)
+router.get('/holdings', asyncHandler(portfolioController.getDefaultHoldings));
+router.post('/holdings', asyncHandler(portfolioController.addDefaultHolding));
+router.delete('/holdings/:holdingId', asyncHandler(portfolioController.removeDefaultHolding));
+
 router.get('/', asyncHandler(portfolioController.getPortfolios));
 router.post('/', asyncHandler(portfolioController.createPortfolio));
 router.get('/:id', asyncHandler(portfolioController.getPortfolio));

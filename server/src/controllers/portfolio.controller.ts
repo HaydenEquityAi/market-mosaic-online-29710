@@ -6,6 +6,28 @@ import marketDataService from '../services/marketData.service';
 import cryptoService from '../services/crypto.service';
 import currencyService from '../services/currency.service';
 
+// ===== In-memory guest portfolio store =====
+type GuestHolding = {
+  id: string;
+  symbol: string;
+  asset_type: 'stock' | 'crypto' | 'currency';
+  quantity: number;
+  average_price: number;
+  created_at: string;
+  updated_at: string;
+};
+
+const guestPortfolioId = 'guest-default';
+const guestState: { holdings: GuestHolding[] } = { holdings: [] };
+
+function ensureGuestPortfolio(): void {
+  // No-op for now; structure is pre-initialized
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
 export const getPortfolios = async (req: AuthRequest, res: Response) => {
   const userId = req.userId || 'test-user';
 
@@ -92,6 +114,49 @@ export const getPortfolioHoldings = async (req: AuthRequest, res: Response) => {
   const userId = req.userId || 'test-user';
   const { id } = req.params;
 
+  // Guest fallback when no id provided
+  if (!id) {
+    ensureGuestPortfolio();
+
+    // Enrich with prices similar to DB-backed path
+    const enrichedHoldings = await Promise.all(
+      guestState.holdings.map(async (holding) => {
+        let currentPrice = 0;
+        try {
+          if (holding.asset_type === 'stock') {
+            const quote = await marketDataService.getStockQuote(holding.symbol);
+            currentPrice = quote?.price || 0;
+          } else if (holding.asset_type === 'crypto') {
+            const crypto = await cryptoService.getCrypto(holding.symbol.toLowerCase());
+            currentPrice = crypto?.price || 0;
+          } else if (holding.asset_type === 'currency') {
+            const [from, to] = holding.symbol.split('/');
+            const pair = await currencyService.getExchangeRate(from, to);
+            currentPrice = pair?.rate || 0;
+          }
+        } catch (error) {
+          console.error(`Error fetching current price for ${holding.symbol}:`, error);
+        }
+
+        const currentValue = currentPrice * holding.quantity;
+        const costBasis = holding.average_price * holding.quantity;
+        const gainLoss = currentValue - costBasis;
+        const gainLossPercent = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
+
+        return {
+          ...holding,
+          currentPrice,
+          currentValue,
+          costBasis,
+          gainLoss,
+          gainLossPercent,
+        } as any;
+      })
+    );
+
+    return res.json({ data: enrichedHoldings });
+  }
+
   // Verify portfolio belongs to user
   const portfolioResult = await query(
     'SELECT id FROM portfolios WHERE id = $1 AND user_id = $2',
@@ -158,6 +223,45 @@ export const addHolding = async (req: AuthRequest, res: Response) => {
     throw new AppError('Symbol, asset type, quantity, and price are required', 400);
   }
 
+  // Guest path when no id provided
+  if (!id) {
+    ensureGuestPortfolio();
+
+    const existing = guestState.holdings.find(
+      (h) => h.symbol.toUpperCase() === symbol.toUpperCase() && h.asset_type === assetType
+    );
+
+    const qty = parseFloat(quantity);
+    const prc = parseFloat(price);
+    let saved: GuestHolding;
+
+    if (existing) {
+      const totalQty = existing.quantity + qty;
+      const newAverage = (existing.quantity * existing.average_price + qty * prc) / totalQty;
+      existing.quantity = totalQty;
+      existing.average_price = newAverage;
+      existing.updated_at = nowIso();
+      saved = existing;
+    } else {
+      const created: GuestHolding = {
+        id: Date.now().toString(),
+        symbol: symbol.toUpperCase(),
+        asset_type: assetType,
+        quantity: qty,
+        average_price: prc,
+        created_at: nowIso(),
+        updated_at: nowIso(),
+      };
+      guestState.holdings.push(created);
+      saved = created;
+    }
+
+    return res.status(201).json({
+      message: 'Holding added successfully',
+      data: saved,
+    });
+  }
+
   // Verify portfolio belongs to user
   const portfolioResult = await query(
     'SELECT id FROM portfolios WHERE id = $1 AND user_id = $2',
@@ -215,6 +319,19 @@ export const removeHolding = async (req: AuthRequest, res: Response) => {
   const userId = req.userId || 'test-user';
   const { id, holdingId } = req.params;
 
+  // Guest path when no id provided
+  if (!id) {
+    ensureGuestPortfolio();
+    const before = guestState.holdings.length;
+    const afterList = guestState.holdings.filter((h) => h.id !== holdingId);
+    if (afterList.length === before) {
+      throw new AppError('Holding not found', 404);
+    }
+    guestState.holdings.length = 0;
+    guestState.holdings.push(...afterList);
+    return res.json({ message: 'Holding removed successfully' });
+  }
+
   // Verify portfolio belongs to user
   const portfolioResult = await query(
     'SELECT id FROM portfolios WHERE id = $1 AND user_id = $2',
@@ -258,4 +375,23 @@ export const getPortfolioTransactions = async (req: AuthRequest, res: Response) 
   );
 
   res.json({ data: result.rows });
+};
+
+// ===== Guest-friendly controller wrappers (no :id required) =====
+export const getDefaultHoldings = async (req: AuthRequest, res: Response) => {
+  // Reuse getPortfolioHoldings with no id to trigger guest path
+  (req as any).params = { ...(req as any).params };
+  delete (req as any).params.id;
+  return getPortfolioHoldings(req, res);
+};
+
+export const addDefaultHolding = async (req: AuthRequest, res: Response) => {
+  (req as any).params = { ...(req as any).params };
+  delete (req as any).params.id;
+  return addHolding(req, res);
+};
+
+export const removeDefaultHolding = async (req: AuthRequest, res: Response) => {
+  (req as any).params = { holdingId: (req as any).params?.holdingId };
+  return removeHolding(req, res);
 };
