@@ -54,9 +54,11 @@ app.use(cors({
     }
 
     // Check if origin matches Vercel preview URL pattern
-    // Pattern: https://market-mosaic-online-29710-*-*.vercel.app
-    const vercelPattern = /^https:\/\/market-mosaic-online-29710-[\w-]+-[\w]+\.vercel\.app$/;
+    // Pattern: https://market-mosaic-online-29710-{segment1}-{segment2}-{segment3}.vercel.app
+    // Matches patterns like: market-mosaic-online-29710-git-main-hayden-5176s-projects
+    const vercelPattern = /^https:\/\/market-mosaic-online-29710-[a-z0-9-]+\.vercel\.app$/;
     if (vercelPattern.test(origin)) {
+      console.log(`✅ CORS allowed for Vercel preview: ${origin}`);
       return callback(null, true);
     }
 
