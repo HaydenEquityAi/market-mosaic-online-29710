@@ -14,6 +14,8 @@ import portfolioRoutes from './routes/portfolio.routes';
 import cryptoRoutes from './routes/crypto.routes';
 import currencyRoutes from './routes/currency.routes';
 import strategyRoutes from './routes/strategy.routes';
+import newsRoutes from './routes/news.routes';
+import smartMoneyRoutes from './routes/smartMoney.routes';
 
 // Load environment variables
 dotenv.config();
@@ -56,6 +58,8 @@ app.use('/api/portfolios', portfolioRoutes);
 app.use('/api/crypto', cryptoRoutes);
 app.use('/api/currencies', currencyRoutes);
 app.use('/api/strategies', strategyRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/smartmoney', smartMoneyRoutes);
 
 // 404 handler
 app.use(notFound);
@@ -89,6 +93,8 @@ const startServer = async () => {
       console.log(`🔗 Health check: http://localhost:${PORT}/health`);
       console.log(`📡 API Base URL: http://localhost:${PORT}/api`);
       console.log(`\n✅ Server started successfully!\n`);
+      console.log(`📰 News API: http://localhost:${PORT}/api/news`);
+      console.log(`💰 Smart Money API: http://localhost:${PORT}/api/smartmoney`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
