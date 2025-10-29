@@ -1,0 +1,8 @@
+server/
+financial-market-backend/
+*.md
+.git
+.env
+node_modules
+brokerai-new-files-only/
+
