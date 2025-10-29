@@ -13,6 +13,7 @@ import { portfolioApi, stocksApi } from '@/services/api';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { formatCurrency, formatNumber, formatPercent, formatShares } from '@/utils/formatters';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -417,7 +418,7 @@ const Portfolio = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${(portfolioMetrics.totalValue || 0).toFixed(2)}
+                  {formatCurrency(portfolioMetrics.totalValue || 0)}
                   </div>
                 </CardContent>
               </Card>
@@ -431,10 +432,10 @@ const Portfolio = () => {
                 <CardContent>
                   <div className={cn(
                     "text-2xl font-bold",
-                    (portfolioMetrics.totalGainLoss || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                    'text-muted-foreground'
                   )}>
                     {(portfolioMetrics.totalGainLoss || 0) >= 0 ? '+' : ''}
-                    ${(portfolioMetrics.totalGainLoss || 0).toFixed(2)}
+                  {formatCurrency(portfolioMetrics.totalGainLoss || 0)}
                   </div>
                 </CardContent>
               </Card>
@@ -448,10 +449,10 @@ const Portfolio = () => {
                 <CardContent>
                   <div className={cn(
                     "text-2xl font-bold",
-                    (portfolioMetrics.totalGainPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                    'text-muted-foreground'
                   )}>
                     {(portfolioMetrics.totalGainPercent || 0) >= 0 ? '+' : ''}
-                    {(portfolioMetrics.totalGainPercent || 0).toFixed(2)}%
+                  {formatPercent(portfolioMetrics.totalGainPercent || 0)}
                   </div>
                 </CardContent>
               </Card>
@@ -467,7 +468,7 @@ const Portfolio = () => {
                     {portfolioMetrics.bestPerformer?.symbol || 'N/A'}
                   </div>
                   <div className="text-sm text-green-500">
-                    +{(portfolioMetrics.bestPerformer?.gainPercent || 0).toFixed(2)}%
+                  {formatPercent(portfolioMetrics.bestPerformer?.gainPercent || 0)}
                   </div>
                 </CardContent>
               </Card>
@@ -479,11 +480,11 @@ const Portfolio = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-500">
+                  <div className="text-2xl font-bold text-muted-foreground">
                     {portfolioMetrics.worstPerformer?.symbol || 'N/A'}
                   </div>
-                  <div className="text-sm text-red-500">
-                    {(portfolioMetrics.worstPerformer?.gainPercent || 0).toFixed(2)}%
+                  <div className="text-sm text-muted-foreground">
+                  {formatPercent(portfolioMetrics.worstPerformer?.gainPercent || 0)}
                   </div>
                 </CardContent>
               </Card>
@@ -521,20 +522,20 @@ const Portfolio = () => {
                             <td className="py-3 px-3 sm:px-4 font-semibold text-xs sm:text-sm">{item.symbol}</td>
                             <td className="hidden md:table-cell py-3 px-3 sm:px-4 text-xs sm:text-sm truncate max-w-[120px]">{item.name}</td>
                             <td className="py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">{item.quantity || 0}</td>
-                            <td className="py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.price || 0).toFixed(2)}</td>
-                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.currentPrice || 0).toFixed(2)}</td>
-                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">${(item.marketValue || 0).toFixed(2)}</td>
+                            <td className="py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">{formatCurrency(item.price || 0)}</td>
+                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">{formatCurrency(item.currentPrice || 0)}</td>
+                            <td className="hidden lg:table-cell py-3 px-3 sm:px-4 text-right text-xs sm:text-sm">{formatCurrency(item.marketValue || 0)}</td>
                             <td className={cn(
                               "py-3 px-3 sm:px-4 text-right font-medium text-xs sm:text-sm",
-                              (item.gainLoss || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                              'text-muted-foreground'
                             )}>
-                              {(item.gainLoss || 0) >= 0 ? '+' : ''}${(item.gainLoss || 0).toFixed(2)}
+                              {formatCurrency(item.gainLoss || 0)}
                             </td>
                             <td className={cn(
                               "py-3 px-3 sm:px-4 text-right font-medium text-xs sm:text-sm",
-                              (item.gainPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'
+                              'text-muted-foreground'
                             )}>
-                              {(item.gainPercent || 0) >= 0 ? '+' : ''}{(item.gainPercent || 0).toFixed(1)}%
+                              {formatPercent(item.gainPercent || 0)}
                             </td>
                             <td className="py-3 px-3 sm:px-4 text-right">
                               <Button
@@ -576,7 +577,7 @@ const Portfolio = () => {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: any) => `$${Number(value || 0).toFixed(2)}`} />
+                    <Tooltip formatter={(value: any) => formatCurrency(Number(value || 0))} />
                     <Legend wrapperStyle={{ fontSize: '12px' }} />
                   </PieChart>
                 </ResponsiveContainer>

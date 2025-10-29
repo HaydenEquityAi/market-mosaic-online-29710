@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { newsApi, type NewsArticle, type SentimentData } from '@/services/newsApi';
+import { formatNewsTime } from '@/utils/formatters';
 
 interface NewsItem {
   id: string;
@@ -39,7 +40,7 @@ const mapNewsToUi = (articles: NewsArticle[] | undefined): NewsItem[] => {
     impactPercent: a.sentimentScore !== undefined ? `${(Math.abs(a.sentimentScore) * 100).toFixed(0)}%` : '+0%',
     ticker: a.ticker || 'MARKET',
     source: a.source || 'Unknown',
-    time: new Date(a.publishedAt).toLocaleString(),
+    time: formatNewsTime(a.publishedAt),
     url: a.url || '#',
   }));
 };

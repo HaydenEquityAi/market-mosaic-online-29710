@@ -250,38 +250,77 @@ export function Dashboard() {
               />
             </div>
             
-            {/* Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
-              <StatsCard 
-                title="Market Cap" 
-                value="$13.42T"
-                trend={0.47}
-                icon={<Wallet2 />}
-                className="bg-primary/5"
-              />
-              <StatsCard 
-                title="Trading Volume" 
-                value="487.32M"
-                description="Today's volume"
-                icon={<BarChart3 />}
-                className="bg-primary/5"
-              />
-              <StatsCard 
-                title="Top Gainer" 
-                value={topGainer?.symbol || 'N/A'}
-                trend={topGainer?.changePercent || 0}
-                trendLabel={topGainer?.name || 'No data'}
-                icon={<TrendingUp />}
-                className="bg-success/5"
-              />
-              <StatsCard 
-                title="Top Loser" 
-                value={topLoser?.symbol || 'N/A'}
-                trend={topLoser?.changePercent || 0}
-                trendLabel={topLoser?.name || 'No data'}
-                icon={<TrendingDown />}
-                className="bg-danger/5"
-              />
+            {/* Two-column main layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Left 2/3: Intelligence sections */}
+              <div className="lg:col-span-2 space-y-4">
+                <NewsSentimentAnalyzer />
+                <SmartMoneyTracker />
+                <PredictiveIntelligence />
+              </div>
+
+              {/* Right 1/3: Portfolio + stats + watchlist + global */}
+              <div className="lg:col-span-1 space-y-4">
+                <PortfolioIntelligence 
+                  portfolioValue={247815}
+                  dailyChange={5947}
+                  dailyChangePercent={2.4}
+                  techExposure={68}
+                  sharpeRatio={1.23}
+                  beta={1.05}
+                  dividendYield={1.7}
+                />
+
+                <div className="grid grid-cols-1 gap-3">
+                  <StatsCard 
+                    title="Market Cap" 
+                    value="$13,420,000,000,000.00"
+                    icon={<Wallet2 />}
+                  />
+                  <StatsCard 
+                    title="Trading Volume" 
+                    value="487,320,000"
+                    description="Today's volume"
+                    icon={<BarChart3 />}
+                  />
+                  <StatsCard 
+                    title="Top Gainer" 
+                    value={topGainer?.symbol || 'N/A'}
+                    trend={undefined}
+                    trendLabel={topGainer?.name || 'No data'}
+                    icon={<TrendingUp />}
+                  />
+                  <StatsCard 
+                    title="Top Loser" 
+                    value={topLoser?.symbol || 'N/A'}
+                    trend={undefined}
+                    trendLabel={topLoser?.name || 'No data'}
+                    icon={<TrendingDown />}
+                  />
+                </div>
+
+                {/* Watchlist */}
+                <div className="space-y-3">
+                  <h2 className="text-lg font-semibold">Watchlist</h2>
+                  <div className="space-y-3">
+                    {stocksWithHistory.slice(0, 5).map((stock) => (
+                      <StockCard 
+                        key={stock?.symbol || 'unknown'} 
+                        stock={stock} 
+                        priceHistory={stock?.priceHistory || []}
+                        onClick={() => setSelectedStock(stock)}
+                        className={selectedStock?.symbol === stock?.symbol ? "ring-1 ring-muted-foreground/40" : ""}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Global Markets */}
+                <div className="space-y-3">
+                  <h2 className="text-lg font-semibold">Global Markets</h2>
+                  <MarketOverview indices={indicesArray} />
+                </div>
+              </div>
             </div>
             
             {/* Main Content Layout */}
