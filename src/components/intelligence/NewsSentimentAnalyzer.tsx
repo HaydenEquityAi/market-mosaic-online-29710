@@ -192,10 +192,10 @@ export function NewsSentimentAnalyzer() {
           
           {/* Social Sentiment Tab */}
           <TabsContent value="social" className="space-y-3">
-            <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <div className="mb-4 p-3 rounded-lg border">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-blue-500" />
-                <span className="text-sm font-semibold">Trending Tickers</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-semibold">Community Sentiment</span>
               </div>
               <div className="flex gap-2 flex-wrap">
                 {(uiSentiment || []).slice(0, 8).map((s) => (
@@ -216,41 +216,30 @@ export function NewsSentimentAnalyzer() {
                     <Badge variant="outline" className="font-mono text-base font-bold">
                       {sentiment.ticker}
                     </Badge>
-                    <div className="flex items-center gap-1">
-                      <Twitter className="h-3 w-3 text-blue-400" />
-                      <MessageSquare className="h-3 w-3 text-purple-400" />
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <Badge variant="outline">Reddit</Badge>
+                      <Badge variant="outline">Twitter/X</Badge>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className={cn(
-                      'text-2xl font-bold',
-                      getSentimentColor(sentiment.positivePercent)
+                      'text-2xl font-bold text-foreground'
                     )}>
                       {sentiment.positivePercent}%
                     </p>
-                    <p className="text-xs text-muted-foreground">positive</p>
+                    <p className="text-xs text-muted-foreground">positive (of total mentions)</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Change:</span>
-                    <span className={cn(
-                      'font-semibold',
-                      sentiment.change > 0 ? 'text-emerald-500' : 'text-red-500'
-                    )}>
-                      {sentiment.change > 0 ? '+' : ''}{sentiment.change}%
-                    </span>
+                    <span className="text-muted-foreground">Mentions:</span>
+                    <span className="font-semibold text-foreground">{sentiment.totalMentions}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Trending:</span>
                     <div className="flex items-center gap-1">
-                      <div className="w-16 bg-muted rounded-full h-1.5">
-                        <div 
-                          className="bg-blue-500 h-1.5 rounded-full"
-                          style={{ width: `${sentiment.trendingScore}%` }}
-                        />
-                      </div>
+                      <div className="w-16 bg-muted rounded-full h-1.5" />
                       <span className="font-semibold text-xs">{sentiment.trendingScore}</span>
                     </div>
                   </div>
@@ -260,12 +249,7 @@ export function NewsSentimentAnalyzer() {
             
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" size="sm">
-                <Twitter className="h-4 w-4 mr-2" />
-                View Tweets
-              </Button>
-              <Button variant="outline" className="flex-1" size="sm">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                View Stocktwits
+                Community Sources
               </Button>
             </div>
           </TabsContent>

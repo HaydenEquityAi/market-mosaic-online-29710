@@ -19,6 +19,7 @@ import { NewsCard } from '@/components/news/NewsCard';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, TrendingDown, TrendingUp, Wallet2, Menu, X, Newspaper, TrendingDown as TrendingIcon, LineChart, Sparkles } from 'lucide-react';
+import { formatWithSuffix, formatCurrency } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -274,12 +275,12 @@ export function Dashboard() {
                 <div className="grid grid-cols-1 gap-3">
                   <StatsCard 
                     title="Market Cap" 
-                    value="$13,420,000,000,000.00"
+                    value={formatWithSuffix(13420000000000, 2)}
                     icon={<Wallet2 />}
                   />
                   <StatsCard 
                     title="Trading Volume" 
-                    value="487,320,000"
+                    value={formatWithSuffix(487320000, 2)}
                     description="Today's volume"
                     icon={<BarChart3 />}
                   />

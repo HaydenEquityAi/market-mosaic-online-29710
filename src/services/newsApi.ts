@@ -48,9 +48,25 @@ export const newsApi = {
   /**
    * Get social sentiment for tickers
    */
-  async getSocialSentiment(tickers: string[]) {
-    const response = await axios.get(`${API_BASE_URL}/news/sentiment/social?tickers=${tickers.join(',')}`);
-    return response.data.data as SentimentData[];
+  async getSocialSentiment(symbols: string[]) {
+    const response = await axios.get(`${API_BASE_URL}/news/social-sentiment?symbols=${symbols.join(',')}`);
+    // Backend does not return neutralPercent/change24h; compute neutral as remainder, set change24h to 0
+    const rows = response.data.data as Array<{
+      ticker: string;
+      totalMentions: number;
+      positivePercent: number;
+      negativePercent: number;
+      trendingScore: number;
+    }>;
+    return rows.map((r) => ({
+      ticker: r.ticker,
+      totalMentions: r.totalMentions,
+      positivePercent: r.positivePercent,
+      negativePercent: r.negativePercent,
+      neutralPercent: Math.max(0, 100 - (r.positivePercent + r.negativePercent)),
+      trendingScore: r.trendingScore,
+      change24h: 0,
+    })) as SentimentData[];
   },
 
   /**

@@ -10,5 +10,6 @@ router.get('/ticker/:symbol', newsController.getTickerNews.bind(newsController))
 // Sentiment endpoints
 router.get('/sentiment/social', newsController.getSocialSentiment.bind(newsController));
 router.get('/sentiment/trending', newsController.getTrendingTickers.bind(newsController));
+router.get('/social-sentiment', newsController.getFinnhubSocialSentiment.bind(newsController));
 
 export default router;
