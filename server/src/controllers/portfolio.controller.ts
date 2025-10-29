@@ -36,7 +36,7 @@ export const getPortfolios = async (req: AuthRequest, res: Response) => {
     [userId]
   );
 
-  res.json({ data: result.rows });
+  return res.json({ data: result.rows });
 };
 
 export const getPortfolio = async (req: AuthRequest, res: Response) => {
@@ -52,7 +52,7 @@ export const getPortfolio = async (req: AuthRequest, res: Response) => {
     throw new AppError('Portfolio not found', 404);
   }
 
-  res.json({ data: result.rows[0] });
+  return res.json({ data: result.rows[0] });
 };
 
 export const createPortfolio = async (req: AuthRequest, res: Response) => {
@@ -68,7 +68,7 @@ export const createPortfolio = async (req: AuthRequest, res: Response) => {
     [userId, name, description || null]
   );
 
-  res.status(201).json({
+  return res.status(201).json({
     message: 'Portfolio created successfully',
     data: result.rows[0],
   });
@@ -88,7 +88,7 @@ export const updatePortfolio = async (req: AuthRequest, res: Response) => {
     throw new AppError('Portfolio not found', 404);
   }
 
-  res.json({
+  return res.json({
     message: 'Portfolio updated successfully',
     data: result.rows[0],
   });
@@ -107,7 +107,7 @@ export const deletePortfolio = async (req: AuthRequest, res: Response) => {
     throw new AppError('Portfolio not found', 404);
   }
 
-  res.json({ message: 'Portfolio deleted successfully' });
+  return res.json({ message: 'Portfolio deleted successfully' });
 };
 
 export const getPortfolioHoldings = async (req: AuthRequest, res: Response) => {
@@ -211,7 +211,7 @@ export const getPortfolioHoldings = async (req: AuthRequest, res: Response) => {
     })
   );
 
-  res.json({ data: enrichedHoldings });
+  return res.json({ data: enrichedHoldings });
 };
 
 export const addHolding = async (req: AuthRequest, res: Response) => {
@@ -309,7 +309,7 @@ export const addHolding = async (req: AuthRequest, res: Response) => {
     [id, symbol.toUpperCase(), assetType, 'buy', quantity, price, parseFloat(quantity) * parseFloat(price), new Date()]
   );
 
-  res.status(201).json({
+  return res.status(201).json({
     message: 'Holding added successfully',
     data: result.rows[0],
   });
@@ -351,7 +351,7 @@ export const removeHolding = async (req: AuthRequest, res: Response) => {
     throw new AppError('Holding not found', 404);
   }
 
-  res.json({ message: 'Holding removed successfully' });
+  return res.json({ message: 'Holding removed successfully' });
 };
 
 export const getPortfolioTransactions = async (req: AuthRequest, res: Response) => {
@@ -374,7 +374,7 @@ export const getPortfolioTransactions = async (req: AuthRequest, res: Response) 
     [id, limit, offset]
   );
 
-  res.json({ data: result.rows });
+  return res.json({ data: result.rows });
 };
 
 // ===== Guest-friendly controller wrappers (no :id required) =====
