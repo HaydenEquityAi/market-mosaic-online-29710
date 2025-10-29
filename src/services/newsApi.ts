@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3010/api';
+// Use the same base URL configuration as api.ts
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.brokerai.ai/api';
 
 export interface NewsArticle {
   id: string;
