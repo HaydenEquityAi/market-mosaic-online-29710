@@ -121,6 +121,10 @@ export const portfolioApi = {
   },
 };
 
+// Re-export new services
+export { newsApi } from './newsApi';
+export { smartMoneyApi } from './smartMoneyApi';
+
 // Analysis API (NOTE: Not implemented in backend yet)
 export const analysisApi = {
   getSectors: async () => {

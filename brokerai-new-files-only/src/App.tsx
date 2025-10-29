@@ -14,7 +14,8 @@ import Portfolio from "./pages/Portfolio";
 import Performance from "./pages/Performance";
 import Analysis from "./pages/Analysis";
 import Settings from "./pages/Settings";
-// New Intelligence Pages
+// New Enhanced Pages
+import { EnhancedDashboard } from "./components/layout/EnhancedDashboard";
 import { NewsSentimentPage } from "./pages/NewsSentimentPage";
 import { SmartMoneyPage } from "./pages/SmartMoneyPage";
 import { PredictionsPage } from "./pages/PredictionsPage";
@@ -28,7 +29,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          {/* Enhanced Dashboard as main route */}
+          <Route path="/" element={<EnhancedDashboard />} />
           
           {/* New Intelligence Routes */}
           <Route path="/news-sentiment" element={<NewsSentimentPage />} />
@@ -44,6 +46,9 @@ const App = () => (
           <Route path="/performance" element={<Performance />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/settings" element={<Settings />} />
+          
+          {/* Classic Dashboard (if you want to keep it) */}
+          <Route path="/classic" element={<Index />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
