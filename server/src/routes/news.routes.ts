@@ -12,4 +12,7 @@ router.get('/sentiment/social', newsController.getSocialSentiment.bind(newsContr
 router.get('/sentiment/trending', newsController.getTrendingTickers.bind(newsController));
 router.get('/social-sentiment', newsController.getFinnhubSocialSentiment.bind(newsController));
 
+// Compatibility alias: /api/news/:symbol → ticker news
+router.get('/:symbol', newsController.getTickerNews.bind(newsController));
+
 export default router;

@@ -13,4 +13,11 @@ router.get('/hedgefunds/activity', smartMoneyController.getHedgeFundActivity.bin
 router.get('/insiders/trades', smartMoneyController.getInsiderTrades.bind(smartMoneyController));
 router.get('/insiders/tickers', smartMoneyController.getInsiderTradesForTickers.bind(smartMoneyController));
 
+// Aliases expected by some clients
+// /api/smartmoney/flow → use hedge fund activity as institutional flow proxy
+router.get('/flow', smartMoneyController.getHedgeFundActivity.bind(smartMoneyController));
+// /api/smartmoney/sentiment → use congress trades recency as sentiment proxy
+router.get('/sentiment', smartMoneyController.getCongressTrades.bind(smartMoneyController));
+
 export default router;
+
