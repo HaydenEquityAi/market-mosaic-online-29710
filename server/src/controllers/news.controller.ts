@@ -1,3 +1,79 @@
+import { Request, Response } from 'express';
+import { newsService } from '../services/news.service';
+
+class NewsController {
+  async getLatestNews(req: Request, res: Response) {
+    try {
+      const { limit, tickers } = req.query as { limit?: string; tickers?: string };
+      const parsedLimit = limit ? parseInt(limit, 10) : 20;
+      const tickerList = tickers ? tickers.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean) : undefined;
+
+      const data = await newsService.getLatestNews(parsedLimit, tickerList);
+      res.json({ data });
+    } catch (error) {
+      console.error('getLatestNews error:', error);
+      res.json({ data: [] });
+    }
+  }
+
+  async getTickerNews(req: Request, res: Response) {
+    try {
+      const { symbol } = req.params;
+      const { limit } = req.query as { limit?: string };
+      const parsedLimit = limit ? parseInt(limit, 10) : 10;
+
+      const data = symbol
+        ? await newsService.getTickerNews(symbol.toUpperCase(), parsedLimit)
+        : [];
+
+      res.json({ data });
+    } catch (error) {
+      console.error('getTickerNews error:', error);
+      res.json({ data: [] });
+    }
+  }
+
+  async getSocialSentiment(req: Request, res: Response) {
+    try {
+      const { tickers } = req.query as { tickers?: string };
+      const tickerList = tickers ? tickers.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean) : [];
+
+      const data = tickerList.length > 0 ? await newsService.getSocialSentiment(tickerList) : [];
+      res.json({ data });
+    } catch (error) {
+      console.error('getSocialSentiment error:', error);
+      res.json({ data: [] });
+    }
+  }
+
+  async getTrendingTickers(req: Request, res: Response) {
+    try {
+      const data = await newsService.getTrendingTickers();
+      res.json({ data });
+    } catch (error) {
+      console.error('getTrendingTickers error:', error);
+      res.json({ data: ['NVDA', 'AMD', 'TSLA', 'AAPL', 'MSFT'] });
+    }
+  }
+
+  async getFinnhubSocialSentiment(req: Request, res: Response) {
+    try {
+      const { tickers } = req.query as { tickers?: string };
+      const tickerList = tickers ? tickers.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean) : [];
+
+      // Using aggregated social sentiment as a proxy; dedicated Finnhub
+      // social sentiment endpoint can be wired here later.
+      const data = tickerList.length > 0 ? await newsService.getSocialSentiment(tickerList) : [];
+      res.json({ data });
+    } catch (error) {
+      console.error('getFinnhubSocialSentiment error:', error);
+      res.json({ data: [] });
+    }
+  }
+}
+
+export const newsController = new NewsController();
+
 import axios from 'axios';
 import type { Request, Response } from 'express';
 import { newsService } from '../services/news.service';
