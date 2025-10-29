@@ -170,18 +170,18 @@ export function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 animate-slide-up" style={{ '--delay': '50ms' } as React.CSSProperties}>
               {/* News Sentiment Card */}
               <Link to="/news-sentiment" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer border-primary/20 hover:border-primary/40">
+                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="p-2 sm:p-3 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
                         <Newspaper className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
                           News & Sentiment
                         </h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          Real-time market sentiment from news
+                          Real-time market sentiment
                         </p>
                       </div>
                     </div>
@@ -191,18 +191,18 @@ export function Dashboard() {
               
               {/* Smart Money Card */}
               <Link to="/smart-money" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer border-primary/20 hover:border-primary/40">
+                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="p-2 sm:p-3 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
                         <Wallet2 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
                           Smart Money Tracker
                         </h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          Track institutional investor moves
+                          Track institutional moves
                         </p>
                       </div>
                     </div>
@@ -212,18 +212,18 @@ export function Dashboard() {
               
               {/* Predictive Intelligence Card */}
               <Link to="/predictions" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer border-primary/20 hover:border-primary/40">
+                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="p-2 sm:p-3 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
                         <LineChart className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
                           Predictive Intelligence
                         </h3>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          AI-powered market predictions
+                          AI-powered predictions
                         </p>
                       </div>
                     </div>
