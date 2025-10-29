@@ -33,41 +33,33 @@ export function EnhancedSidebar({ isCollapsed, onToggle, className }: SidebarPro
       title: 'Overview',
       icon: Home,
       href: '/',
-      emoji: '🏠'
     },
     {
       title: 'Portfolio Analytics',
       icon: BarChart3,
       href: '/portfolio',
-      emoji: '📊'
     },
     {
       title: 'News & Sentiment',
       icon: Newspaper,
       href: '/news-sentiment',
-      badge: 3,
-      badgeColor: 'bg-blue-500',
-      emoji: '📰'
+      badge: undefined,
     },
     {
       title: 'Smart Money',
       icon: Briefcase,
       href: '/smart-money',
-      badge: 5,
-      badgeColor: 'bg-purple-500',
-      emoji: '💼'
+      badge: undefined,
     },
     {
       title: 'Markets & Predictions',
       icon: TrendingUp,
       href: '/predictions',
-      emoji: '📈'
     },
     {
       title: 'Settings',
       icon: Settings,
       href: '/settings',
-      emoji: '⚙️'
     }
   ];
 
@@ -83,8 +75,8 @@ export function EnhancedSidebar({ isCollapsed, onToggle, className }: SidebarPro
           "flex items-center gap-2 transition-opacity duration-200",
           isCollapsed ? "opacity-0" : "opacity-100"
         )}>
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
-            <Activity className="h-5 w-5 text-white" />
+          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <Activity className="h-5 w-5 text-sidebar-foreground" />
           </div>
           <h2 className="font-bold tracking-tight">BrokerAI</h2>
         </div>

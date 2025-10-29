@@ -61,11 +61,11 @@ const mockPredictions: PredictionData[] = [
 
 export function PredictiveIntelligence() {
   return (
-    <Card className="border-2 border-purple-500/20 bg-gradient-to-br from-background via-background to-purple-500/5">
+    <Card className="border bg-card">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-            <Sparkles className="h-4 w-4 text-purple-500" />
+          <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-muted-foreground" />
           </div>
           Predictive Intelligence
         </CardTitle>

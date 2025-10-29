@@ -100,10 +100,10 @@ export function SmartMoneyTracker() {
   const insiders = useMemo(() => mapInsiders(insidersRaw), [insidersRaw]);
   
   return (
-    <Card className="border-2 border-purple-500/20">
+    <Card className="border bg-card">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Building2 className="h-5 w-5 text-purple-500" />
+          <Building2 className="h-5 w-5 text-muted-foreground" />
           Smart Money Movements
         </CardTitle>
       </CardHeader>

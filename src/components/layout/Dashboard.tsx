@@ -8,6 +8,11 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { StockCard } from '@/components/stocks/StockCard';
 import { StockChart } from '@/components/stocks/StockChart';
+import { PortfolioIntelligence } from '@/components/intelligence/PortfolioIntelligence';
+import { NewsSentimentAnalyzer } from '@/components/intelligence/NewsSentimentAnalyzer';
+import { PredictiveIntelligence } from '@/components/intelligence/PredictiveIntelligence';
+import { SmartMoneyTracker } from '@/components/intelligence/SmartMoneyTracker';
+import { EnhancedHoldingsTable } from '@/components/portfolio/EnhancedHoldingsTable';
 import { MarketOverview } from '@/components/markets/MarketOverview';
 import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { NewsCard } from '@/components/news/NewsCard';
@@ -166,15 +171,15 @@ export function Dashboard() {
           <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
             <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Market Dashboard</h1>
             
-            {/* Intelligence Navigation Cards */}
+            {/* Intelligence Navigation Cards (monochrome) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 animate-slide-up" style={{ '--delay': '50ms' } as React.CSSProperties}>
               {/* News Sentiment Card */}
               <Link to="/news-sentiment" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
+                <Card className="h-full transition-all duration-300 hover:bg-accent/50 cursor-pointer">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="p-2 sm:p-3 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                        <Newspaper className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                      <div className="p-2 sm:p-3 rounded-lg bg-muted">
+                        <Newspaper className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
@@ -191,11 +196,11 @@ export function Dashboard() {
               
               {/* Smart Money Card */}
               <Link to="/smart-money" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
+                <Card className="h-full transition-all duration-300 hover:bg-accent/50 cursor-pointer">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="p-2 sm:p-3 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                        <Wallet2 className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                      <div className="p-2 sm:p-3 rounded-lg bg-muted">
+                        <Wallet2 className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
@@ -212,11 +217,11 @@ export function Dashboard() {
               
               {/* Predictive Intelligence Card */}
               <Link to="/predictions" className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-md cursor-pointer bg-primary/5 hover:bg-primary/10">
+                <Card className="h-full transition-all duration-300 hover:bg-accent/50 cursor-pointer">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="p-2 sm:p-3 rounded-lg bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors">
-                        <LineChart className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
+                      <div className="p-2 sm:p-3 rounded-lg bg-muted">
+                        <LineChart className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
@@ -230,6 +235,19 @@ export function Dashboard() {
                   </CardContent>
                 </Card>
               </Link>
+            </div>
+
+            {/* Portfolio Intelligence Hero (monochrome) */}
+            <div className="mb-6 animate-slide-up" style={{ '--delay': '80ms' } as React.CSSProperties}>
+              <PortfolioIntelligence 
+                portfolioValue={247815}
+                dailyChange={5947}
+                dailyChangePercent={2.4}
+                techExposure={68}
+                sharpeRatio={1.23}
+                beta={1.05}
+                dividendYield={1.7}
+              />
             </div>
             
             {/* Stats Row */}
@@ -284,7 +302,7 @@ export function Dashboard() {
                 </div>
               </div>
               
-              {/* Middle column - Chart and news */}
+              {/* Middle column - Chart and Intelligence */}
               <div className="lg:col-span-2 space-y-4 animate-slide-up" style={{ '--delay': '300ms' } as React.CSSProperties}>
                 {selectedStock && (
                   <StockChart 
@@ -294,13 +312,16 @@ export function Dashboard() {
                     volatility={2.5}
                   />
                 )}
-                <NewsCard news={mockNews} className="mt-4 sm:mt-6" />
+                <NewsSentimentAnalyzer />
+                <PredictiveIntelligence />
               </div>
               
-              {/* Right column - Markets and currencies */}
+              {/* Right column - Markets, Smart Money, Holdings */}
               <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '400ms' } as React.CSSProperties}>
                 <MarketOverview indices={indicesArray} />
                 <CurrencyExchange currencies={currencies} />
+                <SmartMoneyTracker />
+                <EnhancedHoldingsTable />
               </div>
             </div>
           </div>

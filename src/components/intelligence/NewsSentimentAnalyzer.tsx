@@ -82,12 +82,8 @@ export function NewsSentimentAnalyzer() {
   const uiSentiment = useMemo(() => mapSentimentToUi(socialSentiment), [socialSentiment]);
   
   const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'high': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      case 'medium': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-      case 'low': return 'bg-gray-500/10 text-gray-600 border-gray-500/20';
-      default: return '';
-    }
+    // Monochrome badge styling
+    return 'bg-muted/30 text-foreground border-muted/40';
   };
   
   const getSentimentColor = (percent: number) => {
@@ -97,11 +93,11 @@ export function NewsSentimentAnalyzer() {
   };
   
   return (
-    <Card className="border-2 border-blue-500/20">
+    <Card className="border bg-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Newspaper className="h-5 w-5 text-blue-500" />
+            <Newspaper className="h-5 w-5 text-muted-foreground" />
             News & Social Intelligence
           </CardTitle>
           <div className="flex gap-2">
