@@ -2,7 +2,8 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, TrendingUp, TrendingDown, Trash2, Search, X } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Trash2, Search, X, Wifi, RefreshCw } from 'lucide-react';
+import { LivePriceDisplay } from '@/components/ui/LivePriceDisplay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -102,9 +103,9 @@ const Portfolio = () => {
     retry: 3,
   });
 
-  // Fetch current stock prices for all holdings
+  // Fetch current stock prices for all holdings - 60 second refresh
   const symbols = holdings.map((h: Holding) => h.symbol);
-  const { data: stockDataMap = {} } = useQuery({
+  const { data: stockDataMap = {}, isFetching: pricesFetching, dataUpdatedAt: pricesUpdatedAt } = useQuery({
     queryKey: ['stock-quotes', symbols],
     queryFn: async () => {
       if (symbols.length === 0) return {};
@@ -112,7 +113,8 @@ const Portfolio = () => {
       return Object.fromEntries(quotes.map((s: StockData) => [s.symbol, s]));
     },
     enabled: symbols.length > 0,
-    refetchInterval: 60000,
+    refetchInterval: 60000, // 60 seconds for portfolio
+    staleTime: 50000,
   });
 
   // Search stocks for dialog
@@ -269,9 +271,23 @@ const Portfolio = () => {
       <div className="space-y-4 sm:space-y-6">
         {/* Header with Add Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">My Portfolio</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">Track your investments in real-time</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-2xl sm:text-3xl font-bold">My Portfolio</h1>
+              {pricesFetching ? (
+                <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+              ) : (
+                <Wifi className="h-4 w-4 text-green-500 animate-pulse" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm sm:text-base text-muted-foreground">Track your investments in real-time</p>
+              {pricesUpdatedAt && (
+                <span className="text-xs text-muted-foreground">
+                  • Updated {Math.floor((Date.now() - pricesUpdatedAt) / 1000)}s ago
+                </span>
+              )}
+            </div>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

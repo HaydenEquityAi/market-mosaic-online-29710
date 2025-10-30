@@ -18,7 +18,7 @@ import { CurrencyExchange } from '@/components/currencies/CurrencyExchange';
 import { NewsCard } from '@/components/news/NewsCard';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, TrendingDown, TrendingUp, Wallet2, Menu, X, Newspaper, TrendingDown as TrendingIcon, LineChart, Sparkles } from 'lucide-react';
+import { BarChart3, TrendingDown, TrendingUp, Wallet2, Menu, X, Newspaper, TrendingDown as TrendingIcon, LineChart, Sparkles, Wifi, RefreshCw } from 'lucide-react';
 import { formatWithSuffix, formatCurrency } from '@/utils/formatters';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -27,28 +27,28 @@ import { cn } from '@/lib/utils';
 export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
-  // Fetch real data from API
-  const { data: stocks, isLoading: stocksLoading, error: stocksError } = useQuery({
+  // Fetch real data from API - 30 second refresh for Dashboard
+  const { data: stocks, isLoading: stocksLoading, error: stocksError, isFetching: stocksFetching, dataUpdatedAt: stocksUpdatedAt } = useQuery({
     queryKey: ['stocks', ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']],
     queryFn: () => stocksApi.getMultipleQuotes(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']),
-    refetchInterval: 60000, // Refresh every 60 seconds
-    staleTime: 30000, // Consider data stale after 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 25000, // Consider data stale after 25 seconds
     retry: 3,
   });
 
-  const { data: indices, isLoading: indicesLoading, error: indicesError } = useQuery({
+  const { data: indices, isLoading: indicesLoading, error: indicesError, isFetching: indicesFetching } = useQuery({
     queryKey: ['market-indices'],
     queryFn: marketsApi.getIndices,
-    refetchInterval: 60000,
-    staleTime: 30000,
+    refetchInterval: 30000,
+    staleTime: 25000,
     retry: 3,
   });
 
-  const { data: cryptos, isLoading: cryptosLoading } = useQuery({
+  const { data: cryptos, isLoading: cryptosLoading, isFetching: cryptosFetching } = useQuery({
     queryKey: ['top-cryptos'],
     queryFn: () => currenciesApi.getTopCryptos(10),
-    refetchInterval: 60000,
-    staleTime: 30000,
+    refetchInterval: 30000,
+    staleTime: 25000,
     retry: 3,
   });
 
@@ -170,7 +170,28 @@ export function Dashboard() {
         
         <main className="flex-1 transition-all duration-300 lg:ml-0">
           <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Market Dashboard</h1>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold">Market Dashboard</h1>
+              {/* Live status indicator */}
+              <div className="flex items-center gap-2">
+                {stocksFetching || indicesFetching || cryptosFetching ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                    <span className="text-xs sm:text-sm text-muted-foreground">Updating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wifi className="h-4 w-4 text-green-500 animate-pulse" />
+                    <span className="text-xs sm:text-sm font-medium">Live</span>
+                  </>
+                )}
+                {stocksUpdatedAt && (
+                  <span className="text-xs text-muted-foreground hidden sm:inline">
+                    • Updated {Math.floor((Date.now() - stocksUpdatedAt) / 1000)}s ago
+                  </span>
+                )}
+              </div>
+            </div>
             
             {/* Intelligence Navigation Cards (monochrome) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6 animate-slide-up" style={{ '--delay': '50ms' } as React.CSSProperties}>

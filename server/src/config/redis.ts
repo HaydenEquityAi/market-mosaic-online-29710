@@ -29,10 +29,13 @@ export const connectRedis = async () => {
 
 export const getFromCache = async (key: string): Promise<any> => {
   try {
+    if (!redisClient.isOpen) {
+      return null; // Redis not connected, return null to trigger API call
+    }
     const data = await redisClient.get(key);
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error('Redis get error:', error);
+    // Redis not available, gracefully degrade to no caching
     return null;
   }
 };
@@ -43,9 +46,13 @@ export const setToCache = async (
   expirationInSeconds: number = 300
 ): Promise<void> => {
   try {
+    if (!redisClient.isOpen) {
+      return; // Redis not connected, skip caching
+    }
     await redisClient.setEx(key, expirationInSeconds, JSON.stringify(value));
   } catch (error) {
-    console.error('Redis set error:', error);
+    // Redis not available, gracefully skip caching
+    // No error logging to avoid spam when Redis is intentionally not configured
   }
 };
 

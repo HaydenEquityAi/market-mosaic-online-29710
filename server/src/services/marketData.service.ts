@@ -38,10 +38,10 @@ class MarketDataService {
         changePercent: parseFloat(quote['10. change percent'].replace('%', '')),
         volume: parseInt(quote['06. volume']),
         marketCap: 0, // Would need another API call
-        lastUpdated: new Date(quote['07. latest trading day']),
+        lastUpdated: new Date(), // Use current timestamp for real-time feel
       };
 
-      await setToCache(cacheKey, stock, 60); // Cache for 1 minute
+      await setToCache(cacheKey, stock, 10); // Cache for 10 seconds (was 60)
       return stock;
     } catch (error) {
       console.error(`Error fetching stock quote for ${symbol}:`, error);
@@ -112,7 +112,7 @@ class MarketDataService {
         data: data.reverse(), // Oldest to newest
       };
 
-      await setToCache(cacheKey, priceHistory, 300); // Cache for 5 minutes
+      await setToCache(cacheKey, priceHistory, 300); // Cache historical data for 5 minutes
       return priceHistory;
     } catch (error) {
       console.error(`Error fetching historical data for ${symbol}:`, error);
@@ -156,7 +156,7 @@ class MarketDataService {
               change: change,
               changePercent: changePercent,
               region: index.region,
-              lastUpdated: new Date(),
+              lastUpdated: new Date(), // Current timestamp
             };
           }
           
@@ -172,7 +172,7 @@ class MarketDataService {
         (index) => index !== null
       ) as MarketIndex[];
 
-      await setToCache(cacheKey, validIndices, 300); // Cache for 5 minutes
+      await setToCache(cacheKey, validIndices, 30); // Cache indices for 30 seconds (was 5 minutes)
       return validIndices;
     } catch (error) {
       console.error('Error fetching market indices:', error);
