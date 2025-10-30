@@ -104,30 +104,30 @@ const Stocks = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="lg:col-span-1 space-y-3 sm:space-y-4">
             <h2 className="text-lg sm:text-xl font-semibold px-2 sm:px-0">All Stocks</h2>
-          <div className="space-y-3 sm:space-y-4">
-            {stocksWithHistory.map((stock: any) => {
-              const previousStock = previousStocksRef.current.find((s: any) => s.symbol === stock.symbol);
-              return (
-                <div key={stock.symbol} className="relative">
-                  <StockCard 
-                    stock={stock} 
-                    priceHistory={stock.priceHistory}
-                    onClick={() => setSelectedStock(stock)}
-                    className={selectedStock?.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
-                  />
-                  {/* Live price overlay indicator */}
-                  {isFetching && selectedStock?.symbol === stock.symbol && (
-                    <div className="absolute top-2 right-2 bg-primary/10 backdrop-blur-sm rounded-full p-1">
-                      <RefreshCw className="h-3 w-3 animate-spin text-primary" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            <div className="space-y-3 sm:space-y-4">
+              {stocksWithHistory.map((stock: any) => {
+                const previousStock = previousStocksRef.current.find((s: any) => s.symbol === stock.symbol);
+                return (
+                  <div key={stock.symbol} className="relative">
+                    <StockCard 
+                      stock={stock} 
+                      priceHistory={stock.priceHistory}
+                      onClick={() => setSelectedStock(stock)}
+                      className={selectedStock?.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
+                    />
+                    {/* Live price overlay indicator */}
+                    {isFetching && selectedStock?.symbol === stock.symbol && (
+                      <div className="absolute top-2 right-2 bg-primary/10 backdrop-blur-sm rounded-full p-1">
+                        <RefreshCw className="h-3 w-3 animate-spin text-primary" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-        
-        <div className="lg:col-span-2 space-y-4">
+          
+          <div className="lg:col-span-2 space-y-4">
           {selectedStock && (
             <>
               {/* Live price display */}
@@ -177,6 +177,7 @@ const Stocks = () => {
               </div>
             </>
           )}
+          </div>
         </div>
       </div>
     </PageLayout>
