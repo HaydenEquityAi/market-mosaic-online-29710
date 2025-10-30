@@ -27,17 +27,20 @@ const PORT = process.env.PORT || 3010;
 app.use(helmet()); // Security headers
 
 // CORS configuration with pattern matching for Vercel preview deployments
-const allowedOrigins = [
-  'http://localhost:8080',
-  'http://localhost:8081',
-  'http://localhost:5173',
-  'https://market-mosaic-online-29710.vercel.app',
-];
+const allowedOrigins: string[] = [];
 
-// Add environment-specific origins if provided
+// Prefer environment-provided origins
 if (process.env.CORS_ORIGIN) {
   const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
   allowedOrigins.push(...envOrigins);
+} else {
+  // Sensible defaults (used primarily in local/dev environments)
+  allowedOrigins.push(
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'http://localhost:5173',
+    'https://market-mosaic-online-29710.vercel.app'
+  );
 }
 
 // CORS with origin validation
@@ -93,6 +96,7 @@ app.get('/health', (req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/stocks', stockRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/portfolios', portfolioRoutes);
 app.use('/api/crypto', cryptoRoutes);
 app.use('/api/currencies', currencyRoutes);
